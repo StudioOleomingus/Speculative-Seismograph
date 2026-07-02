@@ -3,7 +3,7 @@
 // THREE.CanvasTexture wrapped around the drum. Layout is measured once to size
 // the canvas, then drawn; `frontOffset` positions the title on the front face.
 
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
 import { CONFIG } from './config.js';
 
 const L = CONFIG.layout;

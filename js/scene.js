@@ -3,7 +3,7 @@
 // wheel-driven scroll, and the animation loop. Consumes the texture and the
 // front-facing offset from the text renderer.
 
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+import * as THREE from 'three';
 import { CONFIG } from './config.js';
 import { texture, getFrontOffset } from './text-renderer.js';
 
@@ -70,8 +70,40 @@ export function initScene(container) {
   cylinder.rotation.z = Math.PI / 2; // lie horizontally
   scene.add(cylinder);
 
+  // --- Scroll input: wheel, pointer-drag (mouse/touch/pen), and arrow keys ---
   window.addEventListener('wheel', (event) => {
     targetScroll += event.deltaY * CONFIG.scroll.sensitivity;
+  });
+
+  let isDragging = false;
+  let dragStartY = 0;
+  let scrollAtDragStart = 0;
+
+  window.addEventListener('pointerdown', (event) => {
+    // Don't hijack taps/drags on the toggle bank.
+    if (event.target.closest && event.target.closest('#toggle-panel')) return;
+    isDragging = true;
+    dragStartY = event.clientY;
+    scrollAtDragStart = targetScroll;
+  });
+  window.addEventListener('pointermove', (event) => {
+    if (!isDragging) return;
+    targetScroll = scrollAtDragStart + (dragStartY - event.clientY) * CONFIG.scroll.dragSensitivity;
+  });
+  const endDrag = () => { isDragging = false; };
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+
+  window.addEventListener('keydown', (event) => {
+    const step = CONFIG.scroll.keyStep;
+    switch (event.key) {
+      case 'ArrowDown': targetScroll += step; break;
+      case 'ArrowUp':   targetScroll -= step; break;
+      case 'PageDown':  targetScroll += step * 4; break;
+      case 'PageUp':    targetScroll -= step * 4; break;
+      default: return;
+    }
+    event.preventDefault();
   });
 
   window.addEventListener('resize', () => {

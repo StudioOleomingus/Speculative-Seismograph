@@ -1,3 +1,22 @@
+/* Ingram Mono (licensed) — drop the font files into Assets/fonts/ for these to
+   take effect. Until then the canvas text falls back to a monospace font. */
+@font-face {
+    font-family: "Ingram Mono";
+    src: url("../Assets/fonts/IngramMono-Regular.woff2") format("woff2"),
+         url("../Assets/fonts/IngramMono-Regular.otf") format("opentype");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: "Ingram Mono";
+    src: url("../Assets/fonts/IngramMono-Bold.woff2") format("woff2"),
+         url("../Assets/fonts/IngramMono-Bold.otf") format("opentype");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
     margin: 0;
     overflow: hidden;
@@ -23,6 +42,8 @@ body {
     width: 100vw;
     height: 100vh;
     z-index: 1;
+    /* Let pointer-drag scrolling work without the browser hijacking touch gestures. */
+    touch-action: none;
 }
 
 #toggle-panel {

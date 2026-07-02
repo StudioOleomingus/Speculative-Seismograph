@@ -31,9 +31,12 @@ Then open <http://localhost:8000> in a browser. Any static file server works
 
 ## Tech
 
-Plain HTML + CSS + an inline ES-module script. 3D rendering uses
-[Three.js](https://threejs.org) (r0.160.0, loaded from a CDN). Story text is
-rasterized to a texture with the HTML Canvas 2D API. No build step or package manager.
+Plain HTML + CSS + ES modules (`js/`). 3D rendering uses
+[Three.js](https://threejs.org) (r0.185.1), vendored locally in `vendor/` and resolved
+via an import map — no CDN, so the piece runs fully offline. Story text is rasterized to
+a texture with the HTML Canvas 2D API. No build step required.
+
+Scroll with the mouse wheel, by dragging (mouse or touch), or with the arrow / Page keys.
 
 ## License
 

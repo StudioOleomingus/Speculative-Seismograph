@@ -32,9 +32,11 @@ export const CONFIG = {
   // Wheel scrolling: raw wheel scaling, easing, and how scroll maps to the
   // texture's horizontal offset.
   scroll: {
-    sensitivity: 0.002, // wheel deltaY -> targetScroll
-    ease: 0.08,         // eased approach of currentScroll to targetScroll
-    offsetScale: 0.015, // currentScroll -> texture.offset.x
+    sensitivity: 0.002,     // wheel deltaY -> targetScroll
+    ease: 0.08,             // eased approach of currentScroll to targetScroll
+    offsetScale: 0.015,     // currentScroll -> texture.offset.x
+    dragSensitivity: 0.01,  // pointer drag: pixels dragged -> targetScroll
+    keyStep: 0.4,           // arrow-key press -> targetScroll (PageUp/Down = x4)
   },
 
   // Off-screen canvas used to rasterise the story text into a texture.
@@ -45,23 +47,28 @@ export const CONFIG = {
 
   // Text layout on the canvas (drawn rotated 90deg around the drum).
   layout: {
-    startX: -850,
-    maxWidth: 1700,
+    // Text column width along the drum, reduced to 2/3 of the original 1700.
+    // startX is kept at -maxWidth/2 so the column stays centered.
+    maxWidth: 1133,
+    startX: -567,
     initialY: -650,
     padding: 100,
     color: '#222222',
     frontNudge: -0.08, // pushes the title into the upper readable zone
+    // "Ingram Mono" with a monospace fallback (see @font-face in css/style.css).
+    // Sizes reduced by 2 from the original (46/38/28).
     fonts: {
-      header: 'bold 46px "Courier New", Courier, monospace',
-      bullet: '38px "Courier New", Courier, monospace',
-      body:   '28px "Courier New", Courier, monospace',
+      family: '"Ingram Mono", "Courier New", Courier, monospace',
+      header: 'bold 44px "Ingram Mono", "Courier New", Courier, monospace',
+      bullet: '36px "Ingram Mono", "Courier New", Courier, monospace',
+      body:   '26px "Ingram Mono", "Courier New", Courier, monospace',
     },
     // Vertical advances (px) per line kind.
     advance: {
       blank: 20,
       header: 64,
       bullet: 56,
-      bodyLine: 38,  // per wrapped body line
+      bodyLine: 37,  // per wrapped body line (leading reduced by 1 from 38)
       bodyPara: 28,  // extra spacing after a body paragraph
     },
   },

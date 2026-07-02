@@ -1,135 +1,126 @@
 # Speculative-Seismograph — Improvements & Fixes
 
 Ordered from highest impact / lowest effort to larger refactors. Each item is scoped so it can
-be executed as an independent step later.
+be executed as an independent step.
+
+**Status key:** ✅ done · 🟡 partial / in progress · ⬜ open
+
+> The piece has since grown from 4 switches to **5** (32 combinations, `00000`–`11111`), all of
+> which now have story files, and the monolith has been **split into modules** (`css/style.css`,
+> `js/config.js`, `js/text-renderer.js`, `js/scene.js`, `js/toggles.js`, `js/main.js`). Statuses
+> below reflect that current state.
+
+## Progress at a glance
+
+- **A. Bugs & inconsistencies** — ✅ all resolved (A1–A6).
+- **B. Correctness & robustness** — B1–B4, B6 ⬜ open · B5 ✅ done.
+- **C. Input & accessibility** — ✅ both done (C1, C2).
+- **D. Structure & maintainability** — ✅ all done (D1–D4).
+- **E. Assets & housekeeping** — E1 ⬜ open · E2 ✅ done.
 
 ## A. Bugs & inconsistencies (fix first)
 
-### A1. Asset path casing mismatch (breaks on case-sensitive hosts) — **critical**
-`index.html` references `./assets/Switches/...` and `./assets/Lights/...` (lowercase `assets`),
-but the actual folder is `Assets/` (capital **A**). This works on macOS/Windows (case-insensitive)
-but **fails on Linux servers and GitHub Pages** — all switch/light images will 404.
-- Fix: make the references match the folder exactly (`./Assets/...`), or rename the folder to
-  `assets/` and update all references. Pick one casing convention and apply everywhere.
+### ✅ A1. Asset path casing mismatch — **fixed**
+All references now use `./Assets/...` (matching the folder) in `js/config.js` and `js/toggles.js`,
+and the background is `../BASE01.png` in `css/style.css`. No lowercase `./assets` references remain.
 
-### A2. Default state `0000` has no file
-On load, `toggleState = [0,0,0,0]` fetches `./texts/0000.md`, which does not exist, so the first
-thing the user sees is the "No document found" fallback.
-- Fix: add a `0000.md` intro/landing document, **or** change the initial `toggleState` to a
-  combination that has content.
+### ✅ A2. Default state had no file — **fixed**
+The default state is now `00000` (5 switches) and `texts/00000.md` exists, so the piece opens on a
+real document instead of the fallback.
 
-### A3. `0100.md` duplicates `0010.md`
-The two files are byte-for-byte identical (both the "pocket-sized cows" story). One of them is
-almost certainly a placeholder/copy mistake.
-- Fix: replace `0100.md` with its intended story, or remove the switch position from the intended mapping.
+### ✅ A3. Duplicate story files — **fixed**
+The old `0100.md`/`0010.md` duplication is gone. All 32 files (`00000`–`11111`) have distinct
+content (verified by checksum — no duplicates).
 
-### A4. Dead element `#edge-fade`
-`<div id="edge-fade"></div>` exists in the DOM but has no CSS and is never referenced in JS.
-- Fix: either remove it, or implement the intended vignette/edge-fade styling.
+### ✅ A4. Dead element `#edge-fade` — **fixed**
+The unused `<div id="edge-fade">` was removed from `index.html`.
 
-### A5. Missing story files (13 of 16 combinations)
-Only `0001`, `0010`, `0100` exist. With 4 switches there are 16 states; the other 13 (including
-multi-switch combinations) all fall through to the error message.
-- Decide the intended design: is every combination meant to have a story, or only single-bit
-  states? Document the mapping and either author the missing files or constrain the UI.
+### ✅ A5. Missing story files — **fixed (for the 5-switch design)**
+All 32 combinations now have files. **Follow-up:** the numbered files `texts/33.md`–`texts/50.md`
+(minus `45`) are not reachable by any switch combination — they are orphaned. Either fold them into
+the manifest (`texts/index.json`) or remove them. See D4.
 
-### A6. Title/label mismatches
-The `<title>` is "Typewriter Rolling Cylinder" and image `alt` text is generic ("Switch 1"),
-neither reflecting the project. `README.md` is a single line with no run instructions.
-- Fix: set a meaningful `<title>`, descriptive `alt` text, and expand the README (what it is,
-  how to run it locally, the switch→story concept).
+### ✅ A6. Title / label / README mismatches — **fixed**
+`<title>` is now descriptive, switch/light images have meaningful `alt`/`aria-label` text, and the
+README explains what the piece is, the switch→story concept, and how to run it locally.
 
 ## B. Correctness & robustness
 
-### B1. Unbounded scrolling
-`measureTextExtent()` computes the document's full height (`finalY`) but the scroll is never
-clamped to it, so the user can scroll the text completely off the cylinder in either direction.
-- Fix: clamp `targetScroll` between 0 and a max derived from the text extent.
+### ⬜ B1. Unbounded scrolling — **open**
+`js/text-renderer.js` computes the document extent, but `js/scene.js`'s `animate()` never clamps
+`currentScroll`, so the text can still be scrolled entirely off the drum in either direction.
+- Fix: clamp `targetScroll`/`currentScroll` to a range derived from the text extent (expose the
+  measured height from `text-renderer.js`).
 
-### B2. Duplicated layout logic (measure vs. draw)
-`measureTextExtent()` and `parseAndDrawMD()` contain two near-identical passes over the Markdown
-lines with the same font/spacing rules. They will drift out of sync when spacing is edited.
-- Fix: unify into a single layout routine that returns line boxes; measure and draw both consume it.
+### ⬜ B2. Duplicated layout logic (measure vs. draw) — **open**
+`measureTextExtent()` and `drawMarkdown()` in `js/text-renderer.js` still make two near-identical
+passes over the Markdown with the same font/spacing rules; they can drift out of sync.
+- Fix: unify into a single layout routine that returns line boxes, consumed by both measure and draw.
 
-### B3. Redundant scroll scaling
-Scroll is scaled once by `scrollSensitivity` (on `wheel`) and again by `offsetScrollScale`
-(in `animate`). Two magic multipliers do one job.
+### ⬜ B3. Redundant scroll scaling — **open**
+Scroll is still scaled twice — `scroll.sensitivity` (on `wheel`) and `scroll.offsetScale` (in
+`animate`). They are now centralized/documented in `CONFIG`, but remain two multipliers doing one job.
 - Fix: collapse into a single sensitivity constant.
 
-### B4. `texture.dispose()` on every redraw
-`parseAndDrawMD()` calls `texture.dispose()` then immediately keeps using the same `texture`
-object and sets `needsUpdate = true`. Disposing frees the GPU texture only to re-upload it; the
-ordering is confusing and wasteful.
-- Fix: drop the `dispose()` call (a `CanvasTexture` with `needsUpdate = true` re-uploads on its
-  own), or create a fresh texture deliberately if a resize truly requires it.
+### ⬜ B4. `texture.dispose()` on every redraw — **open**
+`drawMarkdown()` still calls `texture.dispose()` and immediately reuses the same texture with
+`needsUpdate = true` (kept deliberately during the refactor; flagged with a code comment).
+- Fix: drop the `dispose()` call (a `CanvasTexture` re-uploads via `needsUpdate` on its own).
 
-### B5. No CDN failure / integrity handling
-Three.js is fetched from `unpkg` with no fallback and no Subresource Integrity. If unpkg is down
-or blocked, the page silently fails.
-- Fix: pin with SRI, and/or vendor `three.module.js` locally so the piece is self-contained
-  (also better for an art piece meant to run offline/in an installation).
+### ✅ B5. No CDN failure / integrity handling — **fixed**
+Three.js r0.185.1 (`three.module.js` + `three.core.js`) is now vendored in `vendor/` and resolved
+via an import map in `index.html`; `js/scene.js` and `js/text-renderer.js` import the bare `three`
+specifier. No CDN, no unpkg, so the piece runs fully offline. Version reconciled to the installed
+`0.185.1`.
 
-### B6. Bullet lines are not wrapped
-Header (`###`) and bullet (`•`/`-`) branches call `fillText` directly with no wrapping, so long
-bullets/headers overflow `MAX_WIDTH`. (Not hit by current content, but latent.)
+### ⬜ B6. Bullet / header lines are not wrapped — **open**
+In `drawMarkdown()`, the `###` header and `•`/`-` bullet branches still call `fillText` directly
+with no wrapping, so long lines overflow `maxWidth`. (Latent with current content.)
 - Fix: route these through `wrapText` too, or document the single-line constraint.
 
 ## C. Input & accessibility
 
-### C1. No touch / drag scrolling
-Only the `wheel` event drives scroll, so the piece is effectively non-functional on touch devices
-and trackpad-only kiosks may behave oddly.
-- Fix: add touch (`touchstart`/`touchmove`) and/or pointer-drag handling; optionally arrow-key scroll.
+### ✅ C1. Touch / drag / keyboard scrolling — **fixed**
+`js/scene.js` now handles wheel, pointer-drag (mouse/touch/pen via Pointer Events, with drags over
+the toggle bank ignored), and arrow / Page keys. `#canvas-container` uses `touch-action: none` so
+touch drags aren't swallowed by browser gestures. Tunables live in `CONFIG.scroll`
+(`dragSensitivity`, `keyStep`).
 
-### C2. Switches aren't keyboard/screen-reader accessible
-Switches are `<div>`s with click handlers — no `role`, `tabindex`, `aria-pressed`, or keyboard
-activation. Lights are decorative but not marked `aria-hidden`.
-- Fix: use `<button>` elements (or add roles + key handlers) and appropriate ARIA state.
+### ✅ C2. Switches keyboard / screen-reader accessible — **fixed**
+`js/toggles.js` now renders each switch as a `<button>` with `aria-pressed` and an `aria-label`;
+the indicator lights are marked `aria-hidden`. Keyboard activation works natively.
 
-## D. Structure & maintainability (larger refactor)
+## D. Structure & maintainability
 
-### D1. Split the monolith into modules
-All 377 lines (markup, CSS, and four logical subsystems) live in one file. Suggested split:
-- `index.html` — markup only.
-- `css/style.css` — extracted styles.
-- `js/toggles.js` — state array, filename, image swapping, click handlers.
-- `js/text-renderer.js` — canvas layout, measure/draw, texture generation.
-- `js/scene.js` — Three.js scene, cylinder, animation loop.
-- `js/main.js` — wires the modules together.
+### ✅ D1. Split the monolith into modules — **done**
+`index.html` is markup-only and loads `css/style.css` + `js/main.js`. Logic is split into
+`js/toggles.js`, `js/text-renderer.js`, `js/scene.js`, wired by `js/main.js`.
 
-Do this **after** A1–A5 so the fixes aren't lost in a large move.
+### ✅ D2. Centralize configuration — **done**
+All magic numbers (camera, cylinder, scroll, canvas, layout/fonts, front nudge, paths) live in a
+single documented `CONFIG` object in `js/config.js`.
 
-### D2. Centralize configuration
-Magic numbers are scattered (`START_X`, `INITIAL_Y`, `-0.08` nudge, camera position, radius,
-`scrollSensitivity`, font sizes). Collect them into one `CONFIG` object so tuning the layout is
-done in one place and the intent of each constant is documented.
+### ✅ D3. Unify switch + light into one component — **done**
+`js/toggles.js` models each switch+light as one `Toggle` unit, built and updated together —
+removing the parallel `data-index` loops and index-mismatch risk.
 
-### D3. Unify switch + light into one component
-Each switch and its light are separate DOM nodes updated by two parallel `forEach` loops keyed by
-`data-index`. Modeling "switch + light" as one unit (rendered/updated together) removes the
-parallel-loop duplication and the risk of index mismatch.
-
-### D4. Data-drive the story mapping
-Rather than deriving filenames implicitly from bit strings, an explicit manifest
-(e.g. `texts/index.json` mapping each combination to a title + file) would make missing entries
-obvious, allow friendly titles, and let the UI show which combinations are populated.
+### ✅ D4. Data-drive the story mapping — **done**
+`texts/index.json` maps every combination to a file + title; `js/main.js` consumes it with a
+direct-filename fallback. **Follow-up:** fold the orphan numbered files (see A5) into the manifest
+or remove them.
 
 ## E. Assets & housekeeping
 
-### E1. Optimize `BASE01.png` (3.8 MB)
-The background is by far the largest asset. Compress / resize to display resolution (and consider
-WebP) to cut load time significantly.
+### ⬜ E1. Optimize `BASE01.png` (3.8 MB) — **open**
+The background is still ~3.9 MB. Compress / resize to display resolution (consider WebP) to cut load time.
 
-### E2. Add a `.gitignore` and remove `.DS_Store`
-`.DS_Store` files are committed throughout. Add `.gitignore` (`.DS_Store`) and remove the tracked copies.
+### ✅ E2. `.gitignore` + remove `.DS_Store` — **done**
+`.gitignore` added (ignores `.DS_Store`, `node_modules/`, and `dist/`); the three tracked
+`.DS_Store` files were removed from the index.
 
 ---
 
-### Suggested execution order
-1. A1 (path casing) — restores broken images.
-2. A2, A3, A4 — quick correctness/content fixes.
-3. E2, E1 — housekeeping and asset weight.
-4. B1–B4 — behavioral robustness.
-5. C1, C2 — input & accessibility.
-6. A5, D4 — settle the story-mapping design.
-7. D1–D3 — modular refactor once the above are stable.
+### Remaining execution order
+1. B1–B4, B6 — behavioral robustness (scroll clamp, unify layout, single sensitivity, drop dispose, wrap headers/bullets).
+2. E1 — optimize `BASE01.png`.
+3. Housekeeping — resolve orphan `texts/33–50.md` (fold into the manifest or remove).

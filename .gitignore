@@ -2,6 +2,10 @@
 .DS_Store
 **/.DS_Store
 
+# Dependencies & build output
+node_modules/
+dist/
+
 # Editor / OS cruft
 *.swp
 Thumbs.db
