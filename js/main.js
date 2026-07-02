@@ -41,7 +41,15 @@ async function loadManifest() {
 function fileForBits(bits) {
   if (manifest) {
     const entry = manifest.stories.find((s) => s.switches === bits);
-    if (entry) return CONFIG.paths.textsBase + entry.file;
+    if (entry) {
+      // A combination may have alternate stories (named <bits>A.md, etc.).
+      // Build the pool of all versions and pick one at random each load, so
+      // the same switch pattern can surface a different story. The 00000
+      // starting page has no alternates and is always shown as-is.
+      const files = [entry.file, ...(entry.alternates || []).map((a) => a.file)];
+      const pick = files[Math.floor(Math.random() * files.length)];
+      return CONFIG.paths.textsBase + pick;
+    }
   }
   return CONFIG.paths.textsBase + bits + '.md';
 }

@@ -1,9 +1,9 @@
 /* Switch + light bank metrics (positions in viewport units so they track the
    BASE01.png console). Tune here — estimated from the reference image. */
 :root {
-    --toggle-center-y: 85.7cqh;  /* vertical center of the row (% of stage) */
+    --toggle-center-y: 88.2cqh;  /* vertical center of the row (% of stage) */
     --toggle-left: 5.3cqw;       /* left edge of the first switch */
-    --toggle-gap: 0.29cqw;       /* gap between every switch/light */
+    --toggle-gap: 0.5cqw;       /* gap between every switch/light */
     --switch-size: 5.85cqw;      /* switch (larger) diameter */
     --light-size: 3.6cqw;        /* light (smaller) diameter */
 }

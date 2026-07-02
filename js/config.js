@@ -78,7 +78,7 @@ export const CONFIG = {
   layout: {
     // Text column width along the drum, reduced to 2/3 of the original 1700.
     // startX is kept at -maxWidth/2 so the column stays centered.
-    maxWidth: 1133,
+    maxWidth: 1080,
     startX: -567,
     initialY: -650,
     padding: 100,
@@ -94,11 +94,11 @@ export const CONFIG = {
     fonts: {
       family: '"Charter", Georgia, "Times New Roman", serif',
       size: {
-        h1: 46,
-        h2: 40,
-        h3: 36,
-        bullet: 38,
-        body: 28,
+        h1: 58,
+        h2: 46,
+        h3: 42,
+        bullet: 36,
+        body: 36,
       },
     },
     // Vertical advances (px): per-line height and gap after each block kind.
@@ -108,8 +108,8 @@ export const CONFIG = {
       h2Line: 50, h2Gap: 16,
       h3Line: 46, h3Gap: 16,
       bulletLine: 44, bulletGap: 12,
-      bodyLine: 37,   // per wrapped body line (leading reduced by 1 from 38)
-      bodyPara: 28,   // extra spacing after a body paragraph
+      bodyLine: 36,   // per wrapped body line (leading reduced by 1 from 38)
+      bodyPara: 20,   // extra spacing after a body paragraph
     },
   },
 

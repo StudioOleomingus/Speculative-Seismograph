@@ -1,5 +1,5 @@
 {
-  "description": "Maps each 5-switch combination to its story file and title.",
+  "description": "Maps each 5-switch combination to its story file and title. Some combinations have alternate stories (listed in 'alternates') that are chosen from at random.",
   "basePath": "./texts/",
   "stories": [
     {
@@ -12,103 +12,205 @@
       "switches": "00001",
       "file": "00001.md",
       "title": "Untitled.Manya",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "00001A.md",
+          "title": "Untitled.Nikhil"
+        }
+      ]
     },
     {
       "switches": "00010",
       "file": "00010.md",
       "title": "Untitled.Bhumika.Devaki",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "00010A.md",
+          "title": "Untitled.Aman"
+        }
+      ]
     },
     {
       "switches": "00011",
       "file": "00011.md",
       "title": "Untitled.Vansh.Muley",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "00011A.md",
+          "title": "Untitled.Ridhi.Siddhi"
+        }
+      ]
     },
     {
       "switches": "00100",
       "file": "00100.md",
       "title": "Untitled.Dhoon.Meenal",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "00100A.md",
+          "title": "Untitled.Trinity Cardozo.Suhaani Naik"
+        }
+      ]
     },
     {
       "switches": "00101",
       "file": "00101.md",
       "title": "Untitled.Janavi.Sarvesh",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "00101A.md",
+          "title": "Untitled.Simran"
+        }
+      ]
     },
     {
       "switches": "00110",
       "file": "00110.md",
       "title": "Untitled.Khwaish.Shah",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "00110A.md",
+          "title": "Untitled.Sharada.Sanika"
+        }
+      ]
     },
     {
       "switches": "00111",
       "file": "00111.md",
       "title": "Untitled Nivedita.Pranayee",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "00111A.md",
+          "title": "Untitled.Ayusha.Anuja"
+        }
+      ]
     },
     {
       "switches": "01000",
       "file": "01000.md",
       "title": "Untitled.Juiee.Kelkar",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01000A.md",
+          "title": "Untitled.Shravani.Harshada"
+        }
+      ]
     },
     {
       "switches": "01001",
       "file": "01001.md",
       "title": "Untitled.Bhakti",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01001A.md",
+          "title": "final.devadathan"
+        }
+      ]
     },
     {
       "switches": "01010",
       "file": "01010.md",
       "title": "Untitled.Sanskar.Pattewar",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01010A.md",
+          "title": "Untitled.Krisha.Mohammed"
+        }
+      ]
     },
     {
       "switches": "01011",
       "file": "01011.md",
       "title": "Untitled.Yadhu",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01011A.md",
+          "title": "Untitled.Tanmay.Milli"
+        }
+      ]
     },
     {
       "switches": "01100",
       "file": "01100.md",
       "title": "Untitled_Sanjhi_Nehal",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01100A.md",
+          "title": "Untitled.Sai.Vidya Maybe"
+        }
+      ]
     },
     {
       "switches": "01101",
       "file": "01101.md",
       "title": "Untitled.Reet",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01101A.md",
+          "title": "Copy of Copy of Untitled.Sai.Vidya"
+        }
+      ]
     },
     {
       "switches": "01110",
       "file": "01110.md",
       "title": "Untitled.Ansh.Parisha",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01110A.md",
+          "title": "Copy of Copy of Copy of Untitled.Sai.Vidya"
+        }
+      ]
     },
     {
       "switches": "01111",
       "file": "01111.md",
       "title": "Untitled.Pranjal.Paras",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "01111A.md",
+          "title": "Untitled.Manvi.Khatri"
+        }
+      ]
     },
     {
       "switches": "10000",
       "file": "10000.md",
       "title": "Untitled.Tripti.Dhruvi",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "10000A.md",
+          "title": "Untitled.Rushaan.Mridul"
+        }
+      ]
     },
     {
       "switches": "10001",
       "file": "10001.md",
       "title": "Untitled.Ishan",
-      "available": true
+      "available": true,
+      "alternates": [
+        {
+          "file": "10001A.md",
+          "title": "Untitled.Divyom.Mehta"
+        }
+      ]
     },
     {
       "switches": "10010",
