@@ -74,28 +74,34 @@
 
     <div id="toggle-panel">
         <div class="toggle-switch" data-index="0">
-            <img src="./assets/Switches/Off.png" alt="Switch 1">
+            <img src="./Assets/Switches/Off.png" alt="Switch 1">
         </div>
         <div class="toggle-light" data-index="0">
-            <img src="./assets/Lights/Off.png" alt="Light 1">
+            <img src="./Assets/Lights/Off.png" alt="Light 1">
         </div>
         <div class="toggle-switch" data-index="1">
-            <img src="./assets/Switches/Off.png" alt="Switch 2">
+            <img src="./Assets/Switches/Off.png" alt="Switch 2">
         </div>
         <div class="toggle-light" data-index="1">
-            <img src="./assets/Lights/Off.png" alt="Light 2">
+            <img src="./Assets/Lights/Off.png" alt="Light 2">
         </div>
         <div class="toggle-switch" data-index="2">
-            <img src="./assets/Switches/Off.png" alt="Switch 3">
+            <img src="./Assets/Switches/Off.png" alt="Switch 3">
         </div>
         <div class="toggle-light" data-index="2">
-            <img src="./assets/Lights/Off.png" alt="Light 3">
+            <img src="./Assets/Lights/Off.png" alt="Light 3">
         </div>
         <div class="toggle-switch" data-index="3">
-            <img src="./assets/Switches/Off.png" alt="Switch 4">
+            <img src="./Assets/Switches/Off.png" alt="Switch 4">
         </div>
         <div class="toggle-light" data-index="3">
-            <img src="./assets/Lights/Off.png" alt="Light 4">
+            <img src="./Assets/Lights/Off.png" alt="Light 4">
+        </div>
+        <div class="toggle-switch" data-index="4">
+            <img src="./Assets/Switches/Off.png" alt="Switch 5">
+        </div>
+        <div class="toggle-light" data-index="4">
+            <img src="./Assets/Lights/Off.png" alt="Light 5">
         </div>
     </div>
 
@@ -103,7 +109,7 @@
         import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
         // --- 1. TOGGLE STATE ---
-        const toggleState = [0, 0, 0, 0];
+        const toggleState = [0, 0, 0, 0, 0];
         const switchEls = document.querySelectorAll('.toggle-switch');
         const lightEls = document.querySelectorAll('.toggle-light');
 
@@ -116,15 +122,15 @@
                 const idx = parseInt(el.dataset.index);
                 const isOn = toggleState[idx] === 1;
                 el.querySelector('img').src = isOn
-                    ? './assets/Switches/On.png'
-                    : './assets/Switches/Off.png';
+                    ? './Assets/Switches/On.png'
+                    : './Assets/Switches/Off.png';
             });
             lightEls.forEach(el => {
                 const idx = parseInt(el.dataset.index);
                 const isOn = toggleState[idx] === 1;
                 el.querySelector('img').src = isOn
-                    ? './assets/Lights/On.png'
-                    : './assets/Lights/Off.png';
+                    ? './Assets/Lights/On.png'
+                    : './Assets/Lights/Off.png';
             });
         }
 
