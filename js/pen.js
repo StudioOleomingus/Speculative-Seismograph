@@ -12,19 +12,34 @@ const P = CONFIG.pen;
 const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
 export function initPen() {
+  // Position + rotation origin shared by the pen and its shadow (same artwork
+  // dimensions, same pivot).
+  const place = (img) => {
+    img.alt = '';
+    img.style.left = P.pivotScreen.x + 'vw';
+    img.style.top = P.pivotScreen.y + 'vh';
+    img.style.width = P.widthVw + 'vw';
+    img.style.transformOrigin = `${P.pivotInImage.x}% ${P.pivotInImage.y}%`;
+  };
+
+  // Shadow sits behind the pen (lower z-index via CSS) and can be nudged.
+  const shadow = document.createElement('img');
+  shadow.id = 'pen-shadow';
+  shadow.src = encodeURI(P.shadowSrc);
+  place(shadow);
+  document.body.appendChild(shadow);
+
   const pen = document.createElement('img');
   pen.id = 'pen';
   pen.src = P.src;
-  pen.alt = '';
-  pen.style.left = P.pivotScreen.x + 'vw';
-  pen.style.top = P.pivotScreen.y + 'vh';
-  pen.style.width = P.widthVw + 'vw';
-  pen.style.transformOrigin = `${P.pivotInImage.x}% ${P.pivotInImage.y}%`;
+  place(pen);
   document.body.appendChild(pen);
 
   const setPenAngle = (deg) => {
-    pen.style.transform =
-      `translate(-${P.pivotInImage.x}%, -${P.pivotInImage.y}%) rotate(${deg}deg)`;
+    const base = `translate(-${P.pivotInImage.x}%, -${P.pivotInImage.y}%)`;
+    pen.style.transform = `${base} rotate(${deg}deg)`;
+    shadow.style.transform =
+      `translate(${P.shadowOffset.x}vw, ${P.shadowOffset.y}vh) ${base} rotate(${deg}deg)`;
   };
   setPenAngle(P.restAngleDeg);
 

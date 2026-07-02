@@ -48,6 +48,10 @@ export const CONFIG = {
   // roughly across sizes. These are calibrated by eye — tune against the render.
   pen: {
     src: './PEN.png',
+    // Shadow drawn behind the pen; shares the pen's pivot/size and rotates with
+    // it. Offset nudges it in viewport units to read as a cast shadow.
+    shadowSrc: './PEN Shadow.png',
+    shadowOffset: { x: 0, y: 4 }, // vw / vh
     // Where the pivot hole sits on screen (viewport %).
     pivotScreen: { x: 9.6, y: 60 },
     // Where the hole is *within* PEN.png (% of the image box) — rotation origin.
