@@ -20,7 +20,7 @@ export const CONFIG = {
   // fov and z are paired so the drum stays the same on-screen size
   // (keep dist * tan(fov/2) roughly constant when tuning). Original: fov 50 @ z 7.
   camera: {
-    fov: 35,
+    fov: 29,
     near: 0.1,
     far: 1000,
     position: [-0.06, -0.35, 10.4],
@@ -28,7 +28,7 @@ export const CONFIG = {
 
   // The rolling drum.
   cylinder: {
-    radius: 1.7,
+    radius: 1.5,
     height: 6.0,
     segments: 512,
   },
@@ -41,6 +41,27 @@ export const CONFIG = {
     offsetScale: 0.015,     // currentScroll -> texture.offset.x
     dragSensitivity: 0.01,  // pointer drag: pixels dragged -> targetScroll
     keyStep: 0.4,           // arrow-key press -> targetScroll (PageUp/Down = x4)
+  },
+
+  // Seismograph pen (PEN.png overlay) that oscillates on scroll.
+  // All screen positions are in viewport units (vw/vh) so they track BASE01.png
+  // roughly across sizes. These are calibrated by eye — tune against the render.
+  pen: {
+    src: './PEN.png',
+    // Where the pivot hole sits on screen (viewport %).
+    pivotScreen: { x: 9.6, y: 60 },
+    // Where the hole is *within* PEN.png (% of the image box) — rotation origin.
+    pivotInImage: { x: 10, y: 50 },
+    widthVw: 19,          // pen image width as % of viewport width
+    restAngleDeg: 0,      // resting angle (0 = as drawn, roughly horizontal)
+
+    // Spring-damped oscillation excited by scroll velocity.
+    stiffness: 0.08,      // spring pull back to rest (higher = snappier)
+    damping: 0.10,        // velocity damping (higher = settles faster)
+    kick: 10,             // scroll velocity -> angular impulse (deg/frame scale)
+    maxAngleDeg: 16,      // clamp so the pen can't swing absurdly
+    noise: 0.4,           // random shake (deg) added while moving
+    restVelocity: 0.002,  // below this scroll speed the pen stops shaking
   },
 
   // Off-screen canvas used to rasterise the story text into a texture.
@@ -69,11 +90,11 @@ export const CONFIG = {
     fonts: {
       family: '"Charter", Georgia, "Times New Roman", serif',
       size: {
-        h1: 44,
-        h2: 38,
-        h3: 34,
-        bullet: 36,
-        body: 26,
+        h1: 46,
+        h2: 40,
+        h3: 36,
+        bullet: 38,
+        body: 28,
       },
     },
     // Vertical advances (px): per-line height and gap after each block kind.

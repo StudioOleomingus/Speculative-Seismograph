@@ -42,7 +42,7 @@ const BLOCK_SPEC = {
   h2:     { size: L.fonts.size.h2,     lineHeight: L.advance.h2Line,     gap: L.advance.h2Gap,     bold: true },
   h3:     { size: L.fonts.size.h3,     lineHeight: L.advance.h3Line,     gap: L.advance.h3Gap,     bold: true },
   bullet: { size: L.fonts.size.bullet, lineHeight: L.advance.bulletLine, gap: L.advance.bulletGap, bold: false },
-  body:   { size: L.fonts.size.body,   lineHeight: L.advance.bodyLine,   gap: L.advance.bodyPara,  bold: false },
+  body:   { size: L.fonts.size.body,   lineHeight: L.advance.bodyLine,   gap: L.advance.bodyPara,  bold: false, justify: true },
 };
 
 function fontStr(size, bold, italic) {
@@ -105,26 +105,57 @@ function toWords(tokens, forceBold, marker) {
   return words;
 }
 
-// Lay out one block's words with word wrapping. Draws when `draw` is true.
-// Returns the y after the block's last line.
-function layoutWords(words, spec, startY, draw) {
-  let curY = startY;
-  let curX = L.startX;
-  let lineHasContent = false;
+// Break a block's words into wrapped lines. Each word carries its measured
+// width; a single fixed space width (base font of the block) is used between
+// words so line breaking and justification agree.
+function breakLines(words, spec) {
+  ctx.font = fontStr(spec.size, false, false);
+  const spaceWidth = ctx.measureText(' ').width;
+
+  const lines = [];
+  let line = [];
+  let lineWidth = 0; // sum of word widths + spaces between them
   for (const wd of words) {
     ctx.font = fontStr(spec.size, wd.bold, wd.italic);
-    const wordWidth = ctx.measureText(wd.text).width;
-    const spaceWidth = ctx.measureText(' ').width;
-    if (lineHasContent && (curX + wordWidth - L.startX) > L.maxWidth) {
-      curY += spec.lineHeight;
-      curX = L.startX;
-      lineHasContent = false;
+    const w = ctx.measureText(wd.text).width;
+    const gap = line.length ? spaceWidth : 0;
+    if (line.length && (lineWidth + gap + w) > L.maxWidth) {
+      lines.push(line);
+      line = [];
+      lineWidth = 0;
     }
-    if (draw) ctx.fillText(wd.text, curX, curY);
-    curX += wordWidth + spaceWidth;
-    lineHasContent = true;
+    const g = line.length ? spaceWidth : 0;
+    line.push({ ...wd, w });
+    lineWidth += g + w;
   }
-  return curY + spec.lineHeight;
+  if (line.length) lines.push(line);
+  return { lines, spaceWidth };
+}
+
+// Lay out one block's words with word wrapping (and justification for body
+// paragraphs). Draws when `draw` is true. Returns the y after the last line.
+function layoutWords(words, spec, startY, draw) {
+  const { lines, spaceWidth } = breakLines(words, spec);
+
+  if (draw) {
+    lines.forEach((line, idx) => {
+      const y = startY + idx * spec.lineHeight;
+      const isLastLine = idx === lines.length - 1;
+      const sumWords = line.reduce((acc, wd) => acc + wd.w, 0);
+      // Justify every line except the last (standard paragraph justification).
+      const justify = spec.justify && !isLastLine && line.length > 1;
+      const gap = justify ? (L.maxWidth - sumWords) / (line.length - 1) : spaceWidth;
+
+      let x = L.startX;
+      for (const wd of line) {
+        ctx.font = fontStr(spec.size, wd.bold, wd.italic);
+        ctx.fillText(wd.text, x, y);
+        x += wd.w + gap;
+      }
+    });
+  }
+
+  return startY + lines.length * spec.lineHeight;
 }
 
 // Single pass over the blocks; measures (draw=false) or renders (draw=true).

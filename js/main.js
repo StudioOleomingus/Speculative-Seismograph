@@ -6,6 +6,7 @@ import { CONFIG } from './config.js';
 import { drawMarkdown } from './text-renderer.js';
 import { initScene, resetScroll } from './scene.js';
 import { initToggles } from './toggles.js';
+import { initPen } from './pen.js';
 
 let manifest = null;
 
@@ -61,6 +62,7 @@ async function loadStory(bits) {
 }
 
 initScene(document.getElementById('canvas-container'));
+initPen();
 
 const toggles = initToggles(
   document.getElementById('toggle-panel'),

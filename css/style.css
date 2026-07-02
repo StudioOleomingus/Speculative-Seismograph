@@ -59,6 +59,14 @@ body {
     touch-action: none;
 }
 
+/* The pen needle — rotates about its pivot hole (transform-origin set in JS). */
+#pen {
+    position: fixed;
+    z-index: 3;
+    pointer-events: none;
+    will-change: transform;
+}
+
 #toggle-panel {
     position: fixed;
     bottom: 60px;

@@ -15,6 +15,10 @@ export function resetScroll() {
   currentScroll = 0;
 }
 
+// Per-frame subscribers, called with (currentScroll, velocity) each frame.
+const frameCallbacks = [];
+export function onFrame(cb) { frameCallbacks.push(cb); }
+
 export function initScene(container) {
   const scene = new THREE.Scene();
 
@@ -112,10 +116,16 @@ export function initScene(container) {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
+  let prevScroll = currentScroll;
   function animate() {
     requestAnimationFrame(animate);
     currentScroll += (targetScroll - currentScroll) * CONFIG.scroll.ease;
     texture.offset.x = getFrontOffset() - currentScroll * CONFIG.scroll.offsetScale;
+
+    const velocity = currentScroll - prevScroll;
+    prevScroll = currentScroll;
+    for (const cb of frameCallbacks) cb(currentScroll, velocity);
+
     renderer.render(scene, camera);
   }
   animate();
