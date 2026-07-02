@@ -16,11 +16,15 @@
 </head>
 <body>
 
-    <div id="bg-frame"></div>
-    <div id="canvas-container"></div>
+    <!-- Fixed 16:9 stage; the window letterboxes around it. Everything lives
+         inside so it scales together and stays aligned. -->
+    <div id="stage">
+        <div id="bg-frame"></div>
+        <div id="canvas-container"></div>
 
-    <!-- Toggle bank is built by js/toggles.js -->
-    <div id="toggle-panel"></div>
+        <!-- Toggle bank is built by js/toggles.js; pen by js/pen.js -->
+        <div id="toggle-panel"></div>
+    </div>
 
     <script type="module" src="./js/main.js"></script>
 </body>

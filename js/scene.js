@@ -22,9 +22,17 @@ export function onFrame(cb) { frameCallbacks.push(cb); }
 export function initScene(container) {
   const scene = new THREE.Scene();
 
+  // Render to the (16:9) stage container, not the raw window, so the framing
+  // is fixed and the drum stays aligned with the background across sizes.
+  const sizeOf = () => ({
+    w: container.clientWidth || window.innerWidth,
+    h: container.clientHeight || window.innerHeight,
+  });
+  let { w, h } = sizeOf();
+
   const camera = new THREE.PerspectiveCamera(
     CONFIG.camera.fov,
-    window.innerWidth / window.innerHeight,
+    w / h,
     CONFIG.camera.near,
     CONFIG.camera.far,
   );
@@ -32,7 +40,7 @@ export function initScene(container) {
 
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setClearColor(0x000000, 0);
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(w, h);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   container.appendChild(renderer.domElement);
 
@@ -111,9 +119,10 @@ export function initScene(container) {
   });
 
   window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
+    ({ w, h } = sizeOf());
+    camera.aspect = w / h;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(w, h);
   });
 
   let prevScroll = currentScroll;

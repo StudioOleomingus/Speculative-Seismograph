@@ -1,3 +1,13 @@
+/* Switch + light bank metrics (positions in viewport units so they track the
+   BASE01.png console). Tune here — estimated from the reference image. */
+:root {
+    --toggle-center-y: 85.7cqh;  /* vertical center of the row (% of stage) */
+    --toggle-left: 5.3cqw;       /* left edge of the first switch */
+    --toggle-gap: 0.29cqw;       /* gap between every switch/light */
+    --switch-size: 5.85cqw;      /* switch (larger) diameter */
+    --light-size: 3.6cqw;        /* light (smaller) diameter */
+}
+
 /* Bitstream Charter (redistributable, bundled in Assets/fonts/ — see
    Charter-LICENSE.txt). Regular, bold, italic, and bold-italic faces — the text
    renderer uses all four for Markdown styling. */
@@ -33,27 +43,34 @@
 body {
     margin: 0;
     overflow: hidden;
-    background-color: #0b0b0b;
+    background-color: #000; /* letterbox bars */
     font-family: monospace;
 }
 
-#bg-frame {
+/* Largest 16:9 box that fits the window, centered. Everything positions
+   relative to this, and cqw/cqh units let children scale with it.
+   (16/9 = 1.7778, 9/16 = 0.5625) */
+#stage {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    inset: 0;
+    margin: auto;
+    width: min(100vw, 177.78vh);
+    height: min(100vh, 56.25vw);
+    overflow: hidden;
+    container-type: size;
+}
+
+#bg-frame {
+    position: absolute;
+    inset: 0;
     background: url('../BASE01.png') center center / cover no-repeat;
     z-index: 0;
     pointer-events: none;
 }
 
 #canvas-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
+    position: absolute;
+    inset: 0;
     z-index: 1;
     /* Let pointer-drag scrolling work without the browser hijacking touch gestures. */
     touch-action: none;
@@ -61,7 +78,7 @@ body {
 
 /* The pen needle — rotates about its pivot hole (transform-origin set in JS). */
 #pen {
-    position: fixed;
+    position: absolute;
     z-index: 3;
     pointer-events: none;
     will-change: transform;
@@ -69,20 +86,21 @@ body {
 
 /* Pen shadow — sits directly behind the pen and rotates with it. */
 #pen-shadow {
-    position: fixed;
+    position: absolute;
     z-index: 2;
     pointer-events: none;
     will-change: transform;
 }
 
 #toggle-panel {
-    position: fixed;
-    bottom: 60px;
-    left: 131px;
+    position: absolute;
+    top: var(--toggle-center-y);
+    left: var(--toggle-left);
+    transform: translateY(-50%);
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: var(--toggle-gap);
     z-index: 10;
 }
 
@@ -91,7 +109,7 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 10px;
+    gap: var(--toggle-gap);
 }
 
 .toggle-switch {
@@ -104,13 +122,13 @@ body {
 }
 
 .toggle-switch img {
-    width: 69px;
+    width: var(--switch-size);
     height: auto;
     display: block;
 }
 
 .toggle-light {
-    width: 46px;
+    width: var(--light-size);
     height: auto;
     display: block;
 }

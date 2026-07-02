@@ -44,8 +44,8 @@ export const CONFIG = {
   },
 
   // Seismograph pen (PEN.png overlay) that oscillates on scroll.
-  // All screen positions are in viewport units (vw/vh) so they track BASE01.png
-  // roughly across sizes. These are calibrated by eye — tune against the render.
+  // Positions/sizes are in stage container units (cqw/cqh, applied in pen.js),
+  // so they scale with the 16:9 stage. Calibrated by eye — tune against render.
   pen: {
     src: './PEN.png',
     // Shadow drawn behind the pen; shares the pen's pivot/size and rotates with
