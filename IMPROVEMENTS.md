@@ -13,7 +13,7 @@ be executed as an independent step.
 ## Progress at a glance
 
 - **A. Bugs & inconsistencies** — ✅ all resolved (A1–A6).
-- **B. Correctness & robustness** — B1–B4, B6 ⬜ open · B5 ✅ done.
+- **B. Correctness & robustness** — B1, B3, B4 ⬜ open · B2, B5, B6 ✅ done · B7 ✅ done (new).
 - **C. Input & accessibility** — ✅ both done (C1, C2).
 - **D. Structure & maintainability** — ✅ all done (D1–D4).
 - **E. Assets & housekeeping** — E1 ⬜ open · E2 ✅ done.
@@ -52,10 +52,9 @@ README explains what the piece is, the switch→story concept, and how to run it
 - Fix: clamp `targetScroll`/`currentScroll` to a range derived from the text extent (expose the
   measured height from `text-renderer.js`).
 
-### ⬜ B2. Duplicated layout logic (measure vs. draw) — **open**
-`measureTextExtent()` and `drawMarkdown()` in `js/text-renderer.js` still make two near-identical
-passes over the Markdown with the same font/spacing rules; they can drift out of sync.
-- Fix: unify into a single layout routine that returns line boxes, consumed by both measure and draw.
+### ✅ B2. Duplicated layout logic (measure vs. draw) — **fixed**
+`js/text-renderer.js` now uses a single `layout(blocks, draw)` pass, called once to measure the
+extent (`draw=false`) and once to render (`draw=true`), so measure and draw can't drift apart.
 
 ### ⬜ B3. Redundant scroll scaling — **open**
 Scroll is still scaled twice — `scroll.sensitivity` (on `wheel`) and `scroll.offsetScale` (in
@@ -73,10 +72,15 @@ via an import map in `index.html`; `js/scene.js` and `js/text-renderer.js` impor
 specifier. No CDN, no unpkg, so the piece runs fully offline. Version reconciled to the installed
 `0.185.1`.
 
-### ⬜ B6. Bullet / header lines are not wrapped — **open**
-In `drawMarkdown()`, the `###` header and `•`/`-` bullet branches still call `fillText` directly
-with no wrapping, so long lines overflow `maxWidth`. (Latent with current content.)
-- Fix: route these through `wrapText` too, or document the single-line constraint.
+### ✅ B6. Bullet / header lines are not wrapped — **fixed**
+All block types (headers, bullets, body) now go through the same word-wrapping routine
+(`layoutWords`), so long headers and bullets wrap within `maxWidth`.
+
+### ✅ B7. Markdown markup rendered as literal text — **fixed** (new)
+The renderer previously only handled `###` headers and `•`/`-` bullets, so `#`/`##` headers,
+`**bold**`, `*italic*`, `***bold italic***`, and `\`-escaped punctuation showed as raw characters.
+`js/text-renderer.js` now parses these into styled runs and renders each with the correct
+weight/style (using iA Writer Quattro's regular/bold/italic/bold-italic faces).
 
 ## C. Input & accessibility
 
@@ -121,6 +125,6 @@ The background is still ~3.9 MB. Compress / resize to display resolution (consid
 ---
 
 ### Remaining execution order
-1. B1–B4, B6 — behavioral robustness (scroll clamp, unify layout, single sensitivity, drop dispose, wrap headers/bullets).
+1. B1, B3, B4 — behavioral robustness (scroll clamp, single sensitivity constant, drop redundant `dispose()`).
 2. E1 — optimize `BASE01.png`.
 3. Housekeeping — resolve orphan `texts/33–50.md` (fold into the manifest or remove).

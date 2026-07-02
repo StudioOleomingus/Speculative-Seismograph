@@ -1,14 +1,15 @@
-Ingram Mono font files go here.
+Fonts used by the piece.
 
-Ingram Mono is a licensed (paid) typeface, so the font files are not included in
-this repository. To enable it in the piece, purchase/obtain the font and place
-the following files in this folder (Assets/fonts/):
+iA Writer Quattro (SIL Open Font License) is bundled here:
 
-    IngramMono-Regular.woff2   (or .otf)
-    IngramMono-Bold.woff2      (or .otf)
+    ia-writer-quattro-latin-400-normal.woff2   (regular)
+    ia-writer-quattro-latin-700-normal.woff2   (bold)
+    ia-writer-quattro-latin-400-italic.woff2   (italic)
+    ia-writer-quattro-latin-700-italic.woff2   (bold italic)
 
-The @font-face rules in css/style.css already point at these filenames, and
-js/main.js preloads them before the first render. If the files are absent, the
-text falls back to a standard monospace font automatically.
+These are referenced by the @font-face rules in css/style.css and preloaded in
+js/main.js before the first render. If they are missing, the text falls back to
+a standard monospace font.
 
-Where to get it: https://www.youworkforthem.com/font/T11571/ingram-mono
+Source: https://github.com/iaolo/iA-Fonts (via the @fontsource/ia-writer-quattro
+npm package). License: SIL OFL 1.1.

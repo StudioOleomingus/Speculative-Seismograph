@@ -9,20 +9,22 @@ import { initToggles } from './toggles.js';
 
 let manifest = null;
 
-// Canvas 2D only uses a web font once it has actually loaded, so preload the
-// Ingram Mono faces before the first draw. Falls back silently to monospace if
-// the font files aren't present.
+// Canvas 2D only uses a web font once it has actually loaded, so preload every
+// iA Writer Quattro face (regular/bold/italic/bold-italic) before the first
+// draw. Falls back silently to monospace if the files aren't present.
 async function ensureFonts() {
   if (!document.fonts) return;
+  const family = '"iA Writer Quattro"';
   try {
     await Promise.all([
-      document.fonts.load('bold 44px "Ingram Mono"'),
-      document.fonts.load('36px "Ingram Mono"'),
-      document.fonts.load('26px "Ingram Mono"'),
+      document.fonts.load(`400 32px ${family}`),
+      document.fonts.load(`700 32px ${family}`),
+      document.fonts.load(`italic 400 32px ${family}`),
+      document.fonts.load(`italic 700 32px ${family}`),
     ]);
     await document.fonts.ready;
   } catch (err) {
-    console.warn('Ingram Mono not loaded, using monospace fallback:', err);
+    console.warn('iA Writer Quattro not loaded, using monospace fallback:', err);
   }
 }
 

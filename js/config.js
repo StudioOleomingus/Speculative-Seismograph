@@ -15,11 +15,15 @@ export const CONFIG = {
   },
 
   // Perspective camera.
+  // Curvature "feel" of the text is controlled here: a narrower fov + larger
+  // distance is more telephoto, which flattens the apparent warp of the drum.
+  // fov and z are paired so the drum stays the same on-screen size
+  // (keep dist * tan(fov/2) roughly constant when tuning). Original: fov 50 @ z 7.
   camera: {
-    fov: 50,
+    fov: 35,
     near: 0.1,
     far: 1000,
-    position: [-0.06, -0.35, 7.0],
+    position: [-0.06, -0.35, 10.4],
   },
 
   // The rolling drum.
@@ -55,21 +59,28 @@ export const CONFIG = {
     padding: 100,
     color: '#222222',
     frontNudge: -0.08, // pushes the title into the upper readable zone
-    // "Ingram Mono" with a monospace fallback (see @font-face in css/style.css).
-    // Sizes reduced by 2 from the original (46/38/28).
+    // "iA Writer Quattro" (bundled in Assets/fonts/, see @font-face in
+    // css/style.css) with a monospace fallback. The renderer builds the actual
+    // canvas font strings from family + size + weight/style.
     fonts: {
-      family: '"Ingram Mono", "Courier New", Courier, monospace',
-      header: 'bold 44px "Ingram Mono", "Courier New", Courier, monospace',
-      bullet: '36px "Ingram Mono", "Courier New", Courier, monospace',
-      body:   '26px "Ingram Mono", "Courier New", Courier, monospace',
+      family: '"iA Writer Quattro", "Courier New", Courier, monospace',
+      size: {
+        h1: 44,
+        h2: 38,
+        h3: 34,
+        bullet: 36,
+        body: 26,
+      },
     },
-    // Vertical advances (px) per line kind.
+    // Vertical advances (px): per-line height and gap after each block kind.
     advance: {
       blank: 20,
-      header: 64,
-      bullet: 56,
-      bodyLine: 37,  // per wrapped body line (leading reduced by 1 from 38)
-      bodyPara: 28,  // extra spacing after a body paragraph
+      h1Line: 58, h1Gap: 16,
+      h2Line: 50, h2Gap: 16,
+      h3Line: 46, h3Gap: 16,
+      bulletLine: 44, bulletGap: 12,
+      bodyLine: 37,   // per wrapped body line (leading reduced by 1 from 38)
+      bodyPara: 28,   // extra spacing after a body paragraph
     },
   },
 
