@@ -107,26 +107,14 @@
     {
       "switches": "01001",
       "file": "01001.md",
-      "title": "Untitled.Bhakti",
-      "available": true,
-      "alternates": [
-        {
-          "file": "01001A.md",
-          "title": "final.devadathan"
-        }
-      ]
+      "title": "final.devadathan",
+      "available": true
     },
     {
       "switches": "01010",
       "file": "01010.md",
-      "title": "Untitled.Sanskar.Pattewar",
-      "available": true,
-      "alternates": [
-        {
-          "file": "01010A.md",
-          "title": "Untitled.Krisha.Mohammed"
-        }
-      ]
+      "title": "Untitled.Krisha.Mohammed",
+      "available": true
     },
     {
       "switches": "01011",
@@ -204,13 +192,7 @@
       "switches": "10001",
       "file": "10001.md",
       "title": "Untitled.Ishan",
-      "available": true,
-      "alternates": [
-        {
-          "file": "10001A.md",
-          "title": "Untitled.Divyom.Mehta"
-        }
-      ]
+      "available": true
     },
     {
       "switches": "10010",
