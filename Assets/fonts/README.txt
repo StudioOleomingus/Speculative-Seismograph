@@ -1,15 +1,17 @@
 Fonts used by the piece.
 
-iA Writer Quattro (SIL Open Font License) is bundled here:
+Bitstream Charter (serif) is bundled here:
 
-    ia-writer-quattro-latin-400-normal.woff2   (regular)
-    ia-writer-quattro-latin-700-normal.woff2   (bold)
-    ia-writer-quattro-latin-400-italic.woff2   (italic)
-    ia-writer-quattro-latin-700-italic.woff2   (bold italic)
+    charter_regular.woff2       (regular)
+    charter_bold.woff2          (bold)
+    charter_italic.woff2        (italic)
+    charter_bold_italic.woff2   (bold italic)
 
 These are referenced by the @font-face rules in css/style.css and preloaded in
 js/main.js before the first render. If they are missing, the text falls back to
-a standard monospace font.
+a serif system font.
 
-Source: https://github.com/iaolo/iA-Fonts (via the @fontsource/ia-writer-quattro
-npm package). License: SIL OFL 1.1.
+License: Bitstream contributed the Charter fonts to the X consortium with
+permission to use, copy, modify, sublicense, sell, and redistribute them,
+provided the notice is kept intact. See Charter-LICENSE.txt (bundled via the
+charter-webfont npm package).

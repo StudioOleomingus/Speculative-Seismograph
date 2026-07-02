@@ -10,11 +10,11 @@ import { initToggles } from './toggles.js';
 let manifest = null;
 
 // Canvas 2D only uses a web font once it has actually loaded, so preload every
-// iA Writer Quattro face (regular/bold/italic/bold-italic) before the first
-// draw. Falls back silently to monospace if the files aren't present.
+// Charter face (regular/bold/italic/bold-italic) before the first draw. Falls
+// back silently to a serif system font if the files aren't present.
 async function ensureFonts() {
   if (!document.fonts) return;
-  const family = '"iA Writer Quattro"';
+  const family = '"Charter"';
   try {
     await Promise.all([
       document.fonts.load(`400 32px ${family}`),
@@ -24,7 +24,7 @@ async function ensureFonts() {
     ]);
     await document.fonts.ready;
   } catch (err) {
-    console.warn('iA Writer Quattro not loaded, using monospace fallback:', err);
+    console.warn('Charter not loaded, using serif fallback:', err);
   }
 }
 

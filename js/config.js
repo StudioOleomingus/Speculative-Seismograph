@@ -57,13 +57,17 @@ export const CONFIG = {
     startX: -567,
     initialY: -650,
     padding: 100,
-    color: '#222222',
+    color: '#000000',
     frontNudge: -0.08, // pushes the title into the upper readable zone
-    // "iA Writer Quattro" (bundled in Assets/fonts/, see @font-face in
-    // css/style.css) with a monospace fallback. The renderer builds the actual
-    // canvas font strings from family + size + weight/style.
+    // Corrects the drum's circumference:height anamorphic stretch (glyphs would
+    // otherwise render ~1.78x too tall). 1.0 = exact geometric correction;
+    // nudge slightly (e.g. 0.95–1.1) if the glyphs still look off.
+    aspect: 1.0,
+    // "Charter" (bundled in Assets/fonts/, see @font-face in css/style.css) with
+    // a serif fallback. The renderer builds the actual canvas font strings from
+    // family + size + weight/style.
     fonts: {
-      family: '"iA Writer Quattro", "Courier New", Courier, monospace',
+      family: '"Charter", Georgia, "Times New Roman", serif',
       size: {
         h1: 44,
         h2: 38,

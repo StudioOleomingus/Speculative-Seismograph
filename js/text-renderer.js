@@ -29,6 +29,13 @@ texture.wrapT = THREE.ClampToEdgeWrapping;
 let frontOffset = 0;
 export function getFrontOffset() { return frontOffset; }
 
+// The canvas is mapped onto the drum where the circumference (2*pi*r) and the
+// height are unequal, so one axis gets more world-space per pixel than the
+// other and glyphs render stretched. Compressing the circumference (scroll)
+// axis by this factor restores square glyphs. `layout.aspect` is a manual nudge.
+const squish =
+  (CONFIG.cylinder.height / (2 * Math.PI * CONFIG.cylinder.radius)) * L.aspect;
+
 // Per-block-type rendering spec (font size, line height, gap after block).
 const BLOCK_SPEC = {
   h1:     { size: L.fonts.size.h1,     lineHeight: L.advance.h1Line,     gap: L.advance.h1Gap,     bold: true },
@@ -136,8 +143,11 @@ function layout(blocks, draw) {
 export function drawMarkdown(mdText) {
   const blocks = parseBlocks(mdText);
 
+  // Text extent along the circumference (scroll) axis, after the squish that
+  // corrects the drum's aspect ratio.
   const finalY = layout(blocks, false);
-  const neededFromCenter = Math.max(Math.abs(L.initialY), Math.abs(finalY)) + L.padding;
+  const halfExtent = Math.max(Math.abs(L.initialY), Math.abs(finalY)) * squish;
+  const neededFromCenter = halfExtent + L.padding;
   const neededWidth = Math.max(CONFIG.canvas.baseSize, neededFromCenter * 2);
 
   textCanvas.width = neededWidth;
@@ -150,6 +160,7 @@ export function drawMarkdown(mdText) {
   ctx.save();
   ctx.translate(textCanvas.width / 2, textCanvas.height / 2);
   ctx.rotate(Math.PI / 2);
+  ctx.scale(1, squish); // compress the circumference axis to un-stretch glyphs
   layout(blocks, true);
   ctx.restore();
 
@@ -160,7 +171,7 @@ export function drawMarkdown(mdText) {
   // Recompute the front-facing offset for the new canvas width.
   //   final_U = 0.5 * repeat + offset = textStartU  ->  offset = textStartU - 0.5 * repeat
   const repeatX = CONFIG.canvas.baseSize / textCanvas.width;
-  const textStartU = 0.5 + Math.abs(L.initialY) / textCanvas.width;
+  const textStartU = 0.5 + (Math.abs(L.initialY) * squish) / textCanvas.width;
   texture.repeat.x = repeatX;
   frontOffset = textStartU - 0.5 * repeatX + L.frontNudge;
   texture.offset.x = frontOffset;

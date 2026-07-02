@@ -1,29 +1,30 @@
-/* iA Writer Quattro (SIL OFL, bundled in Assets/fonts/). Regular, bold, italic,
-   and bold-italic faces — the text renderer uses all four for Markdown styling. */
+/* Bitstream Charter (redistributable, bundled in Assets/fonts/ — see
+   Charter-LICENSE.txt). Regular, bold, italic, and bold-italic faces — the text
+   renderer uses all four for Markdown styling. */
 @font-face {
-    font-family: "iA Writer Quattro";
-    src: url("../Assets/fonts/ia-writer-quattro-latin-400-normal.woff2") format("woff2");
+    font-family: "Charter";
+    src: url("../Assets/fonts/charter_regular.woff2") format("woff2");
     font-weight: 400;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
-    font-family: "iA Writer Quattro";
-    src: url("../Assets/fonts/ia-writer-quattro-latin-700-normal.woff2") format("woff2");
+    font-family: "Charter";
+    src: url("../Assets/fonts/charter_bold.woff2") format("woff2");
     font-weight: 700;
     font-style: normal;
     font-display: swap;
 }
 @font-face {
-    font-family: "iA Writer Quattro";
-    src: url("../Assets/fonts/ia-writer-quattro-latin-400-italic.woff2") format("woff2");
+    font-family: "Charter";
+    src: url("../Assets/fonts/charter_italic.woff2") format("woff2");
     font-weight: 400;
     font-style: italic;
     font-display: swap;
 }
 @font-face {
-    font-family: "iA Writer Quattro";
-    src: url("../Assets/fonts/ia-writer-quattro-latin-700-italic.woff2") format("woff2");
+    font-family: "Charter";
+    src: url("../Assets/fonts/charter_bold_italic.woff2") format("woff2");
     font-weight: 700;
     font-style: italic;
     font-display: swap;
