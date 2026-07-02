@@ -1,0 +1,71 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #0b0b0b;
+    font-family: monospace;
+}
+
+#bg-frame {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: url('../BASE01.png') center center / cover no-repeat;
+    z-index: 0;
+    pointer-events: none;
+}
+
+#canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+}
+
+#toggle-panel {
+    position: fixed;
+    bottom: 60px;
+    left: 51px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+}
+
+/* One switch + light unit. */
+.toggle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-switch {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.toggle-switch img {
+    width: 69px;
+    height: auto;
+    display: block;
+    transition: transform 0.1s ease;
+}
+
+.toggle-switch:active img {
+    transform: scale(0.93);
+}
+
+.toggle-light {
+    width: 46px;
+    height: auto;
+    display: block;
+}

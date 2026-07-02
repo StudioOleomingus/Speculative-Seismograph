@@ -1,0 +1,198 @@
+{
+  "description": "Maps each 5-switch combination to its story file and title.",
+  "basePath": "./texts/",
+  "stories": [
+    {
+      "switches": "00000",
+      "file": "00000.md",
+      "title": "Speculation for an Unsettled Planet.",
+      "available": true
+    },
+    {
+      "switches": "00001",
+      "file": "00001.md",
+      "title": "Untitled.Manya",
+      "available": true
+    },
+    {
+      "switches": "00010",
+      "file": "00010.md",
+      "title": "Untitled.Bhumika.Devaki",
+      "available": true
+    },
+    {
+      "switches": "00011",
+      "file": "00011.md",
+      "title": "Untitled.Vansh.Muley",
+      "available": true
+    },
+    {
+      "switches": "00100",
+      "file": "00100.md",
+      "title": "Untitled.Dhoon.Meenal",
+      "available": true
+    },
+    {
+      "switches": "00101",
+      "file": "00101.md",
+      "title": "Untitled.Janavi.Sarvesh",
+      "available": true
+    },
+    {
+      "switches": "00110",
+      "file": "00110.md",
+      "title": "Untitled.Khwaish.Shah",
+      "available": true
+    },
+    {
+      "switches": "00111",
+      "file": "00111.md",
+      "title": "Untitled Nivedita.Pranayee",
+      "available": true
+    },
+    {
+      "switches": "01000",
+      "file": "01000.md",
+      "title": "Untitled.Juiee.Kelkar",
+      "available": true
+    },
+    {
+      "switches": "01001",
+      "file": "01001.md",
+      "title": "Untitled.Bhakti",
+      "available": true
+    },
+    {
+      "switches": "01010",
+      "file": "01010.md",
+      "title": "Untitled.Sanskar.Pattewar",
+      "available": true
+    },
+    {
+      "switches": "01011",
+      "file": "01011.md",
+      "title": "Untitled.Yadhu",
+      "available": true
+    },
+    {
+      "switches": "01100",
+      "file": "01100.md",
+      "title": "Untitled_Sanjhi_Nehal",
+      "available": true
+    },
+    {
+      "switches": "01101",
+      "file": "01101.md",
+      "title": "Untitled.Reet",
+      "available": true
+    },
+    {
+      "switches": "01110",
+      "file": "01110.md",
+      "title": "Untitled.Ansh.Parisha",
+      "available": true
+    },
+    {
+      "switches": "01111",
+      "file": "01111.md",
+      "title": "Untitled.Pranjal.Paras",
+      "available": true
+    },
+    {
+      "switches": "10000",
+      "file": "10000.md",
+      "title": "Untitled.Tripti.Dhruvi",
+      "available": true
+    },
+    {
+      "switches": "10001",
+      "file": "10001.md",
+      "title": "Untitled.Ishan",
+      "available": true
+    },
+    {
+      "switches": "10010",
+      "file": "10010.md",
+      "title": "Untitle.Aarya.Amrita",
+      "available": true
+    },
+    {
+      "switches": "10011",
+      "file": "10011.md",
+      "title": "Untitled.Aarchi",
+      "available": true
+    },
+    {
+      "switches": "10100",
+      "file": "10100.md",
+      "title": "Untitled.Janvi Beherani",
+      "available": true
+    },
+    {
+      "switches": "10101",
+      "file": "10101.md",
+      "title": "Untitled.Vaishnavi.Priyanshi",
+      "available": true
+    },
+    {
+      "switches": "10110",
+      "file": "10110.md",
+      "title": "Untitled.Rasika.Rajat",
+      "available": true
+    },
+    {
+      "switches": "10111",
+      "file": "10111.md",
+      "title": "Untitled.Gayatri.Mihika",
+      "available": true
+    },
+    {
+      "switches": "11000",
+      "file": "11000.md",
+      "title": "Untitled.Mrudula",
+      "available": true
+    },
+    {
+      "switches": "11001",
+      "file": "11001.md",
+      "title": "Untitled.Priyanka",
+      "available": true
+    },
+    {
+      "switches": "11010",
+      "file": "11010.md",
+      "title": "Untitled.Ananya",
+      "available": true
+    },
+    {
+      "switches": "11011",
+      "file": "11011.md",
+      "title": "Untitled.Jeevitesh",
+      "available": true
+    },
+    {
+      "switches": "11100",
+      "file": "11100.md",
+      "title": "Untitled.Sai.Vidya",
+      "available": true
+    },
+    {
+      "switches": "11101",
+      "file": "11101.md",
+      "title": "What's your source of information?    Friends? Social Media? Gossip? That lizard sitting on your kitchen cabinet?  Or perhaps that strange old artifact from the yesteryears - the News?",
+      "available": true
+    },
+    {
+      "switches": "11110",
+      "file": "11110.md",
+      "title": "Untitled.Hetvi.Shriyans",
+      "available": true
+    },
+    {
+      "switches": "11111",
+      "file": "11111.md",
+      "title": "Untitled.Heeya.Madhura",
+      "available": true
+    }
+  ]
+}
