@@ -54,11 +54,26 @@ function fileForBits(bits) {
   return CONFIG.paths.textsBase + bits + '.md';
 }
 
+// Header image for a switch combination: images/<bits>.png. Keyed by the same
+// 5-bit tag as the texts (alternates share their combination's image). Resolves
+// to null when the image doesn't exist yet, so the text renders without it.
+function imageForBits(bits) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = CONFIG.paths.imagesBase + bits + '.png';
+  });
+}
+
 async function loadStory(bits) {
   try {
-    const res = await fetch(fileForBits(bits));
+    const [res, image] = await Promise.all([
+      fetch(fileForBits(bits)),
+      imageForBits(bits),
+    ]);
     if (!res.ok) throw new Error('File not found');
-    drawMarkdown(await res.text());
+    drawMarkdown(await res.text(), image);
   } catch (err) {
     console.error('Error loading story:', err);
     drawMarkdown(

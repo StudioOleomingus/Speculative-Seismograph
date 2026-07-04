@@ -101,6 +101,8 @@ export const CONFIG = {
         body: 36,
       },
     },
+    // Gap (px) between the optional header image and the first text block.
+    imageGap: 40,
     // Vertical advances (px): per-line height and gap after each block kind.
     advance: {
       blank: 20,
@@ -116,6 +118,7 @@ export const CONFIG = {
   // Story data.
   paths: {
     textsBase: './texts/',
+    imagesBase: './images/', // per-tag header image: <bits>.png (optional)
     manifest: './texts/index.json',
   },
 };

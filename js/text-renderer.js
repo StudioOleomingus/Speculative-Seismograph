@@ -159,8 +159,15 @@ function layoutWords(words, spec, startY, draw) {
 }
 
 // Single pass over the blocks; measures (draw=false) or renders (draw=true).
-function layout(blocks, draw) {
+// An optional header image is laid out first, above the text, scaled to the
+// text column width so it participates in the same measure/draw pass.
+function layout(blocks, draw, image) {
   let y = L.initialY;
+  if (image) {
+    const h = L.maxWidth * (image.naturalHeight / image.naturalWidth);
+    if (draw) ctx.drawImage(image, L.startX, y, L.maxWidth, h);
+    y += h + L.imageGap;
+  }
   for (const block of blocks) {
     if (block.type === 'blank') { y += L.advance.blank; continue; }
     const spec = BLOCK_SPEC[block.type];
@@ -171,12 +178,12 @@ function layout(blocks, draw) {
   return y;
 }
 
-export function drawMarkdown(mdText) {
+export function drawMarkdown(mdText, image = null) {
   const blocks = parseBlocks(mdText);
 
   // Text extent along the circumference (scroll) axis, after the squish that
   // corrects the drum's aspect ratio.
-  const finalY = layout(blocks, false);
+  const finalY = layout(blocks, false, image);
   const halfExtent = Math.max(Math.abs(L.initialY), Math.abs(finalY)) * squish;
   const neededFromCenter = halfExtent + L.padding;
   const neededWidth = Math.max(CONFIG.canvas.baseSize, neededFromCenter * 2);
@@ -192,7 +199,7 @@ export function drawMarkdown(mdText) {
   ctx.translate(textCanvas.width / 2, textCanvas.height / 2);
   ctx.rotate(Math.PI / 2);
   ctx.scale(1, squish); // compress the circumference axis to un-stretch glyphs
-  layout(blocks, true);
+  layout(blocks, true, image);
   ctx.restore();
 
   // NOTE: dispose()+needsUpdate is redundant (see improvement B4); kept here to
