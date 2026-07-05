@@ -119,26 +119,14 @@
     {
       "switches": "01011",
       "file": "01011.md",
-      "title": "Untitled.Yadhu",
-      "available": true,
-      "alternates": [
-        {
-          "file": "01011A.md",
-          "title": "Untitled.Tanmay.Milli"
-        }
-      ]
+      "title": "Untitled.Tanmay.Milli",
+      "available": true
     },
     {
       "switches": "01100",
       "file": "01100.md",
       "title": "Untitled_Sanjhi_Nehal",
-      "available": true,
-      "alternates": [
-        {
-          "file": "01100A.md",
-          "title": "Untitled.Sai.Vidya Maybe"
-        }
-      ]
+      "available": true
     },
     {
       "switches": "01101",
