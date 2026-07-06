@@ -7,6 +7,7 @@ import { drawMarkdown } from './text-renderer.js';
 import { initScene, resetScroll } from './scene.js';
 import { initToggles } from './toggles.js';
 import { initPen } from './pen.js';
+import { initMobile } from './mobile.js';
 
 let manifest = null;
 
@@ -69,6 +70,7 @@ async function loadStory(bits) {
   }
 }
 
+initMobile(); // must run before initScene so boosted scroll config applies
 initScene(document.getElementById('canvas-container'));
 initPen();
 
