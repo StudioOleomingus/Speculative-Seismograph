@@ -7,6 +7,7 @@ import { drawMarkdown } from './text-renderer.js';
 import { initScene, resetScroll } from './scene.js';
 import { initToggles } from './toggles.js';
 import { initPen } from './pen.js';
+import { initMobile } from './mobile.js';
 
 let manifest = null;
 
@@ -68,6 +69,10 @@ async function loadStory(bits) {
     );
   }
 }
+
+// Apply mobile tweaks (scroll boost + font scaling + rotate gate) BEFORE the
+// first drawMarkdown() so the initial render already uses the scaled fonts.
+initMobile();
 
 initScene(document.getElementById('canvas-container'));
 initPen();

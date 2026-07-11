@@ -37,13 +37,18 @@ const squish =
   (CONFIG.cylinder.height / (2 * Math.PI * CONFIG.cylinder.radius)) * L.aspect;
 
 // Per-block-type rendering spec (font size, line height, gap after block).
-const BLOCK_SPEC = {
-  h1:     { size: L.fonts.size.h1,     lineHeight: L.advance.h1Line,     gap: L.advance.h1Gap,     bold: true },
-  h2:     { size: L.fonts.size.h2,     lineHeight: L.advance.h2Line,     gap: L.advance.h2Gap,     bold: true },
-  h3:     { size: L.fonts.size.h3,     lineHeight: L.advance.h3Line,     gap: L.advance.h3Gap,     bold: true },
-  bullet: { size: L.fonts.size.bullet, lineHeight: L.advance.bulletLine, gap: L.advance.bulletGap, bold: false },
-  body:   { size: L.fonts.size.body,   lineHeight: L.advance.bodyLine,   gap: L.advance.bodyPara,  bold: false, justify: true },
-};
+// Built lazily so runtime CONFIG mutations (e.g. mobile.js font scaling, which
+// runs after module load) are picked up instead of a stale import-time snapshot.
+function blockSpec(type) {
+  const SPEC = {
+    h1:     { size: L.fonts.size.h1,     lineHeight: L.advance.h1Line,     gap: L.advance.h1Gap,     bold: true },
+    h2:     { size: L.fonts.size.h2,     lineHeight: L.advance.h2Line,     gap: L.advance.h2Gap,     bold: true },
+    h3:     { size: L.fonts.size.h3,     lineHeight: L.advance.h3Line,     gap: L.advance.h3Gap,     bold: true },
+    bullet: { size: L.fonts.size.bullet, lineHeight: L.advance.bulletLine, gap: L.advance.bulletGap, bold: false },
+    body:   { size: L.fonts.size.body,   lineHeight: L.advance.bodyLine,   gap: L.advance.bodyPara,  bold: false, justify: true },
+  };
+  return SPEC[type];
+}
 
 function fontStr(size, bold, italic) {
   return `${italic ? 'italic ' : ''}${bold ? 700 : 400} ${size}px ${L.fonts.family}`;
@@ -163,7 +168,7 @@ function layout(blocks, draw) {
   let y = L.initialY;
   for (const block of blocks) {
     if (block.type === 'blank') { y += L.advance.blank; continue; }
-    const spec = BLOCK_SPEC[block.type];
+    const spec = blockSpec(block.type);
     const words = toWords(block.tokens, spec.bold, block.type === 'bullet' ? '•' : '');
     y = layoutWords(words, spec, y, draw);
     y += spec.gap;
