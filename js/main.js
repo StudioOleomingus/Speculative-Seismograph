@@ -4,12 +4,17 @@
 
 import { CONFIG } from './config.js';
 import { drawMarkdown } from './text-renderer.js';
-import { initScene, resetScroll } from './scene.js';
+import { initScene, resetScroll, getMaxScroll } from './scene.js';
 import { initToggles } from './toggles.js';
 import { initPen } from './pen.js';
 import { initMobile } from './mobile.js';
+import { fetchCounts, recordViews } from './views.js';
 
 let manifest = null;
+
+// The story currently on the drum, plus the scroll->line map the renderer
+// returned for it. Used to record how far it was read when the reader leaves.
+let currentView = null; // { file, lineScrolls, lineSrc }
 
 // Canvas 2D only uses a web font once it has actually loaded, so preload every
 // Charter face (regular/bold/italic/bold-italic) before the first draw. Falls
@@ -55,19 +60,56 @@ function fileForBits(bits) {
   return CONFIG.paths.textsBase + bits + '.md';
 }
 
+// Record how far the current story was read, then clear it. Called when the
+// reader switches stories or leaves the page. "Every page load" counts once:
+// source lines from the top down to the deepest line reached each get +1.
+function finalizeView() {
+  const view = currentView;
+  currentView = null;
+  if (!view || !view.lineScrolls.length) return;
+
+  const maxScroll = getMaxScroll();
+  const ahead = CONFIG.fade.visibleAhead;
+
+  // Deepest visual line whose front-scroll has been reached, plus a drum-face
+  // of lines below it that are visible even without scrolling.
+  let visualCount = ahead;
+  for (let i = 0; i < view.lineScrolls.length; i++) {
+    if (view.lineScrolls[i] <= maxScroll + 1e-9) visualCount = i + 1 + ahead;
+  }
+  visualCount = Math.min(view.lineScrolls.length, visualCount);
+
+  // Map those visual lines back to a source-line count (contiguous from 0).
+  let sourceLines = 0;
+  for (let i = 0; i < visualCount; i++) {
+    if (view.lineSrc[i] + 1 > sourceLines) sourceLines = view.lineSrc[i] + 1;
+  }
+  recordViews(view.file, sourceLines);
+}
+
 async function loadStory(bits) {
+  const url = fileForBits(bits);
+  const file = url.split('/').pop(); // stable fade key, e.g. "00001A.md"
+
+  // Fetch existing view counts first so the very first render already shows the
+  // accumulated fading from everyone who read this file before.
+  const counts = await fetchCounts(file);
+
+  let text;
   try {
-    const res = await fetch(fileForBits(bits));
+    const res = await fetch(url);
     if (!res.ok) throw new Error('File not found');
-    drawMarkdown(await res.text());
+    text = await res.text();
   } catch (err) {
     console.error('Error loading story:', err);
-    drawMarkdown(
+    text =
       '### ' + bits +
       '\n\nNo document found for\ncombination: ' + bits +
-      '\n\nPlace a file at:\n' + CONFIG.paths.textsBase + bits + '.md',
-    );
+      '\n\nPlace a file at:\n' + CONFIG.paths.textsBase + bits + '.md';
   }
+
+  const meta = drawMarkdown(text, counts);
+  currentView = { file, lineScrolls: meta.lineScrolls, lineSrc: meta.lineSrc };
 }
 
 // Apply mobile tweaks (scroll boost + font scaling + rotate gate) BEFORE the
@@ -79,8 +121,17 @@ initPen();
 
 const toggles = initToggles(
   document.getElementById('toggle-panel'),
-  (bits) => { resetScroll(); loadStory(bits); },
+  // Switching stories: bank the outgoing story's read-depth before loading the
+  // next one, then reset scroll.
+  (bits) => { finalizeView(); resetScroll(); loadStory(bits); },
 );
+
+// Bank the final story's read-depth when the tab is closed or backgrounded.
+// pagehide is the reliable "leaving" signal; sendBeacon (in views.js) survives it.
+window.addEventListener('pagehide', finalizeView);
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden') finalizeView();
+});
 
 await Promise.all([loadManifest(), ensureFonts()]);
 loadStory(toggles.getBits());

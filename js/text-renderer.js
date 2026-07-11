@@ -16,6 +16,19 @@ import { CONFIG } from './config.js';
 
 const L = CONFIG.layout;
 
+// --- Fade state --------------------------------------------------------------
+// Per-source-line view counts for the story currently being drawn, and the
+// per-visual-line metadata produced while laying it out (so scene.js can map a
+// scroll depth back to which source lines were on screen).
+let currentCounts = [];   // counts[sourceLineIndex] = times read
+let visualMeta = [];      // [{ y, src }] one entry per wrapped visual line
+
+// 1 = untouched (full black), 0 = fully faded away. Linear in view count.
+function alphaForSource(src) {
+  const views = currentCounts[src] || 0;
+  return Math.max(0, 1 - views / CONFIG.fade.maxViews);
+}
+
 const textCanvas = document.createElement('canvas');
 const ctx = textCanvas.getContext('2d');
 textCanvas.width = CONFIG.canvas.baseSize;
@@ -79,22 +92,24 @@ function parseInline(text) {
   return tokens;
 }
 
-// Turn a raw document into a list of blocks with parsed inline runs.
+// Turn a raw document into a list of blocks with parsed inline runs. Each block
+// carries `src`, its 0-based line index in the source file, which is the stable
+// key used for fading (independent of how the line wraps on screen).
 function parseBlocks(mdText) {
-  return mdText.split('\n').map((raw) => {
+  return mdText.split('\n').map((raw, src) => {
     const line = raw.trim();
-    if (!line) return { type: 'blank' };
+    if (!line) return { type: 'blank', src };
 
     const header = line.match(/^(#{1,6})\s*(.*)$/);
     if (header) {
       const level = Math.min(header[1].length, 3);
-      return { type: 'h' + level, tokens: parseInline(header[2]) };
+      return { type: 'h' + level, tokens: parseInline(header[2]), src };
     }
 
     const bullet = line.match(/^([•\-]|\*)\s+(.*)$/);
-    if (bullet) return { type: 'bullet', tokens: parseInline(bullet[2]) };
+    if (bullet) return { type: 'bullet', tokens: parseInline(bullet[2]), src };
 
-    return { type: 'body', tokens: parseInline(line) };
+    return { type: 'body', tokens: parseInline(line), src };
   });
 }
 
@@ -138,27 +153,37 @@ function breakLines(words, spec) {
 }
 
 // Lay out one block's words with word wrapping (and justification for body
-// paragraphs). Draws when `draw` is true. Returns the y after the last line.
-function layoutWords(words, spec, startY, draw) {
+// paragraphs). Draws when `draw` is true, else records each wrapped line's
+// position (for scroll->line mapping). Returns the y after the last line.
+function layoutWords(words, spec, startY, draw, src) {
   const { lines, spaceWidth } = breakLines(words, spec);
 
-  if (draw) {
-    lines.forEach((line, idx) => {
-      const y = startY + idx * spec.lineHeight;
-      const isLastLine = idx === lines.length - 1;
-      const sumWords = line.reduce((acc, wd) => acc + wd.w, 0);
-      // Justify every line except the last (standard paragraph justification).
-      const justify = spec.justify && !isLastLine && line.length > 1;
-      const gap = justify ? (L.maxWidth - sumWords) / (line.length - 1) : spaceWidth;
+  lines.forEach((line, idx) => {
+    const y = startY + idx * spec.lineHeight;
 
-      let x = L.startX;
-      for (const wd of line) {
-        ctx.font = fontStr(spec.size, wd.bold, wd.italic);
-        ctx.fillText(wd.text, x, y);
-        x += wd.w + gap;
-      }
-    });
-  }
+    if (!draw) {
+      // Measure pass: remember where every visual line sits, and which source
+      // line it belongs to, so fading and scroll-depth can be resolved later.
+      visualMeta.push({ y, src });
+      return;
+    }
+
+    const isLastLine = idx === lines.length - 1;
+    const sumWords = line.reduce((acc, wd) => acc + wd.w, 0);
+    // Justify every line except the last (standard paragraph justification).
+    const justify = spec.justify && !isLastLine && line.length > 1;
+    const gap = justify ? (L.maxWidth - sumWords) / (line.length - 1) : spaceWidth;
+
+    // Fade the whole visual line by its source line's read count.
+    ctx.globalAlpha = alphaForSource(src);
+
+    let x = L.startX;
+    for (const wd of line) {
+      ctx.font = fontStr(spec.size, wd.bold, wd.italic);
+      ctx.fillText(wd.text, x, y);
+      x += wd.w + gap;
+    }
+  });
 
   return startY + lines.length * spec.lineHeight;
 }
@@ -170,17 +195,20 @@ function layout(blocks, draw) {
     if (block.type === 'blank') { y += L.advance.blank; continue; }
     const spec = blockSpec(block.type);
     const words = toWords(block.tokens, spec.bold, block.type === 'bullet' ? '•' : '');
-    y = layoutWords(words, spec, y, draw);
+    y = layoutWords(words, spec, y, draw, block.src);
     y += spec.gap;
   }
   return y;
 }
 
-export function drawMarkdown(mdText) {
+export function drawMarkdown(mdText, counts = []) {
+  currentCounts = counts || [];
+  visualMeta = [];
+
   const blocks = parseBlocks(mdText);
 
   // Text extent along the circumference (scroll) axis, after the squish that
-  // corrects the drum's aspect ratio.
+  // corrects the drum's aspect ratio. The measure pass also fills visualMeta.
   const finalY = layout(blocks, false);
   const halfExtent = Math.max(Math.abs(L.initialY), Math.abs(finalY)) * squish;
   const neededFromCenter = halfExtent + L.padding;
@@ -197,7 +225,8 @@ export function drawMarkdown(mdText) {
   ctx.translate(textCanvas.width / 2, textCanvas.height / 2);
   ctx.rotate(Math.PI / 2);
   ctx.scale(1, squish); // compress the circumference axis to un-stretch glyphs
-  layout(blocks, true);
+  layout(blocks, true); // sets ctx.globalAlpha per line for fading
+  ctx.globalAlpha = 1;  // reset so nothing else inherits a faded alpha
   ctx.restore();
 
   // NOTE: dispose()+needsUpdate is redundant (see improvement B4); kept here to
@@ -212,4 +241,17 @@ export function drawMarkdown(mdText) {
   frontOffset = textStartU - 0.5 * repeatX + L.frontNudge;
   texture.offset.x = frontOffset;
   texture.needsUpdate = true;
+
+  // Map each visual line to (a) the scroll value at which it reaches the front
+  // of the drum, and (b) its source line. Derived from the same geometry the
+  // scroll uses: a line drawn at layout-y `Y` sits at canvas-x (w/2 - squish*Y),
+  // and offset.x = frontOffset - scroll*offsetScale, giving
+  //   scrollAtFront(Y) = (Y - initialY) * squish / (width * offsetScale).
+  const offsetScale = CONFIG.scroll.offsetScale;
+  const lineScrolls = visualMeta.map(
+    (m) => (m.y - L.initialY) * squish / (textCanvas.width * offsetScale),
+  );
+  const lineSrc = visualMeta.map((m) => m.src);
+
+  return { lineScrolls, lineSrc, sourceLineCount: currentCounts.length };
 }

@@ -118,4 +118,27 @@ export const CONFIG = {
     textsBase: './texts/',
     manifest: './texts/index.json',
   },
+
+  // "Seismograph memory": every view fades the text a little. Counts are shared
+  // across all visitors via the backend at `endpoint` (see backend/README.md).
+  // Fading is tracked per SOURCE line of each story file, so it stays
+  // consistent regardless of screen size / font scaling.
+  fade: {
+    // Base URL of the deployed counter (Cloudflare Worker). Leave '' to disable
+    // fading entirely — the site then behaves exactly as before. Once deployed,
+    // set e.g. 'https://seismograph-views.<you>.workers.dev'.
+    endpoint: 'https://seismograph-views.studio-841.workers.dev',
+
+    // Bump this integer to RESET all fading everywhere. Counts are namespaced by
+    // epoch, so a new epoch starts every page from full-black again (old data is
+    // simply ignored, no database wipe required).
+    epoch: 1,
+
+    // Views at which a line fades to nothing. Past this, the line is invisible.
+    maxViews: 256,
+
+    // How many lines below the front-most line count as "on screen" (and so get
+    // faded) even when the reader hasn't scrolled. Roughly one drum-face of text.
+    visibleAhead: 6,
+  },
 };

@@ -9,11 +9,17 @@ import { texture, getFrontOffset } from './text-renderer.js';
 
 let targetScroll = 0;
 let currentScroll = 0;
+let maxScroll = 0; // deepest scroll reached this page view (for fade recording)
 
 export function resetScroll() {
   targetScroll = 0;
   currentScroll = 0;
+  maxScroll = 0;
 }
+
+// Deepest forward scroll reached since the last resetScroll(). scene maps this
+// (via the renderer's lineScrolls) to how far down the story was read.
+export function getMaxScroll() { return maxScroll; }
 
 // Per-frame subscribers, called with (currentScroll, velocity) each frame.
 const frameCallbacks = [];
@@ -129,6 +135,7 @@ export function initScene(container) {
   function animate() {
     requestAnimationFrame(animate);
     currentScroll += (targetScroll - currentScroll) * CONFIG.scroll.ease;
+    if (currentScroll > maxScroll) maxScroll = currentScroll;
     texture.offset.x = getFrontOffset() - currentScroll * CONFIG.scroll.offsetScale;
 
     const velocity = currentScroll - prevScroll;
