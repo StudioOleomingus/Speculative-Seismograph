@@ -7,8 +7,8 @@
 
 import { CONFIG } from './config.js';
 
-const MOBILE_SCROLL_BOOST = 1.20; // +20% scroll speed on mobile
-const MOBILE_FONT_SCALE = 2;      // 2x text size on mobile (body 36 -> 72)
+const MOBILE_SCROLL_BOOST = 1.50; // +50% scroll speed on mobile (snappier touch)
+const MOBILE_FONT_SCALE = 1.6;    // 1.6x text size on mobile (body 36 -> ~58)
 
 export function isMobileDevice() {
   const coarse = window.matchMedia('(pointer: coarse)').matches;
@@ -34,15 +34,6 @@ export function initMobile() {
   const overlay = document.createElement('div');
   overlay.id = 'rotate-overlay';
   overlay.innerHTML = `
-    <svg viewBox="0 0 64 64" aria-hidden="true">
-      <rect x="22" y="8" width="20" height="36" rx="3"
-            fill="none" stroke="currentColor" stroke-width="3"/>
-      <path d="M50 40 a18 18 0 0 1 -14 14" fill="none"
-            stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-      <path d="M33 57 l4 -4 -4 -4" fill="none"
-            stroke="currentColor" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
     <p>This piece is built for landscape.<br>
        Rotate your phone and go fullscreen to read.</p>
     <button id="rotate-button" type="button">Rotate &amp; go fullscreen</button>

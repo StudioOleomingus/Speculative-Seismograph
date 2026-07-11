@@ -145,32 +145,28 @@ body {
     justify-content: center;
     gap: 1.5rem;
     padding: 2rem;
-    background: #000;
-    color: #e8e4da;
+    background: #ddd0c7; /* beige, matches the console/letterbox */
+    color: #000;
     text-align: center;
+    font-family: "Charter", Georgia, "Times New Roman", serif;
 }
 
 #rotate-overlay.hidden {
     display: none;
 }
 
-#rotate-overlay svg {
-    width: 72px;
-    height: 72px;
-}
-
 #rotate-overlay p {
     margin: 0;
-    font-size: 1rem;
+    font-size: 1.25rem;
     line-height: 1.6;
 }
 
 #rotate-button {
     font-family: inherit;
-    font-size: 1rem;
+    font-size: 1.1rem;
     padding: 0.8em 1.6em;
-    color: #000;
-    background: #e8e4da;
+    color: #ddd0c7;
+    background: #000;
     border: 0;
     border-radius: 4px;
     cursor: pointer;
