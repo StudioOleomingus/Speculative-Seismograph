@@ -16,6 +16,10 @@ let manifest = null;
 // returned for it. Used to record how far it was read when the reader leaves.
 let currentView = null; // { file, lineScrolls, lineSrc }
 
+// Bumped on every loadStory() so a slow view-count response from an earlier
+// story can't paint its fading over a story the reader has since switched to.
+let loadToken = 0;
+
 // Canvas 2D only uses a web font once it has actually loaded, so preload every
 // Charter face (regular/bold/italic/bold-italic) before the first draw. Falls
 // back silently to a serif system font if the files aren't present.
@@ -90,10 +94,13 @@ function finalizeView() {
 async function loadStory(bits) {
   const url = fileForBits(bits);
   const file = url.split('/').pop(); // stable fade key, e.g. "00001A.md"
+  const token = ++loadToken;
 
-  // Fetch existing view counts first so the very first render already shows the
-  // accumulated fading from everyone who read this file before.
-  const counts = await fetchCounts(file);
+  // Kick off the shared view-count fetch, but DON'T wait on it — it's a
+  // cross-origin round trip and blocking the draw on it makes switches feel
+  // laggy. We draw from the (fast, local) story file first, then fade once the
+  // counts arrive.
+  const countsPromise = fetchCounts(file);
 
   let text;
   try {
@@ -108,8 +115,18 @@ async function loadStory(bits) {
       '\n\nPlace a file at:\n' + CONFIG.paths.textsBase + bits + '.md';
   }
 
-  const meta = drawMarkdown(text, counts);
+  if (token !== loadToken) return; // a newer switch superseded this load
+
+  // Immediate draw (full-strength text) so the page appears instantly.
+  const meta = drawMarkdown(text, []);
   currentView = { file, lineScrolls: meta.lineScrolls, lineSrc: meta.lineSrc };
+
+  // Then apply the accumulated fading when the counts land, if this story is
+  // still the one on screen. (No-op when there's no backend or no views yet.)
+  countsPromise.then((counts) => {
+    if (token !== loadToken || !counts || !counts.length) return;
+    drawMarkdown(text, counts);
+  });
 }
 
 // Apply mobile tweaks (scroll boost + font scaling + rotate gate) BEFORE the

@@ -41,12 +41,19 @@ export function recordViews(file, lines) {
   const body = JSON.stringify({ epoch: F.epoch, file, lines });
   try {
     if (navigator.sendBeacon) {
-      const blob = new Blob([body], { type: 'application/json' });
+      // IMPORTANT: send as text/plain, NOT application/json. Cross-origin
+      // beacons with a non-safelisted Content-Type (like application/json)
+      // require a CORS preflight, which sendBeacon can't do — the browser
+      // silently drops the request and nothing is ever recorded. text/plain is
+      // CORS-safelisted, so the POST goes straight through. The Worker parses
+      // the body as JSON regardless of its declared Content-Type.
+      const blob = new Blob([body], { type: 'text/plain' });
       navigator.sendBeacon(url, blob);
     } else {
+      // Same reasoning for the fallback: text/plain avoids a preflight.
       fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         body,
         keepalive: true,
       }).catch(() => { /* best-effort */ });
