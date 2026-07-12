@@ -140,5 +140,15 @@ export const CONFIG = {
     // How many lines below the front-most line count as "on screen" (and so get
     // faded) even when the reader hasn't scrolled. Roughly one drum-face of text.
     visibleAhead: 6,
+
+    // A page counts as "read" once it's been on screen this long (ms). The view
+    // is then recorded immediately — it no longer depends on the reader closing
+    // the tab or switching, which browsers report unreliably. Rapidly flipping
+    // past a page (shorter than this) doesn't count it.
+    recordDelayMs: 1500,
+
+    // Give up on the shared-count fetch after this long so a slow/asleep backend
+    // can never delay the page. The story still draws instantly regardless.
+    timeoutMs: 4000,
   },
 };

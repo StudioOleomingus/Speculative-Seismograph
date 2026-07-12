@@ -6,8 +6,9 @@
 // Endpoints (all CORS-open so the static site can call them from anywhere):
 //   GET  /counts?epoch=<n>&file=<name>
 //        -> { "counts": [int, int, ...] }        // per source line, 0-based
-//   POST /record   { epoch, file, lines }
-//        -> increments source lines [0 .. lines-1] by 1, returns { ok: true }
+//   POST /record   { epoch, file, from, lines }
+//        -> increments source lines [from .. lines-1] by 1, returns { ok: true }
+//           (`from` is optional and defaults to 0)
 //
 // KV key layout: `${epoch}:${file}`. The client bumps `epoch` in config.js to
 // reset all fading — a new epoch reads/writes fresh keys, so every page starts
@@ -77,7 +78,9 @@ export default {
       const file = safeFile(payload.file);
       const epoch = safeEpoch(payload.epoch);
       let lines = parseInt(payload.lines, 10);
-      if (!file || !Number.isFinite(lines) || lines <= 0) {
+      let from = parseInt(payload.from, 10);
+      if (!Number.isFinite(from) || from < 0) from = 0; // optional, defaults to 0
+      if (!file || !Number.isFinite(lines) || lines <= from) {
         return json({ ok: false, error: 'bad request' }, 400);
       }
       lines = Math.min(lines, MAX_LINES);
@@ -85,7 +88,7 @@ export default {
       const key = `${epoch}:${file}`;
       const raw = await env.VIEWS.get(key);
       const counts = raw ? JSON.parse(raw) : [];
-      for (let i = 0; i < lines; i++) counts[i] = (counts[i] || 0) + 1;
+      for (let i = from; i < lines; i++) counts[i] = (counts[i] || 0) + 1;
       await env.VIEWS.put(key, JSON.stringify(counts));
 
       return json({ ok: true });

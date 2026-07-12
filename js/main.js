@@ -13,8 +13,11 @@ import { fetchCounts, recordViews } from './views.js';
 let manifest = null;
 
 // The story currently on the drum, plus the scroll->line map the renderer
-// returned for it. Used to record how far it was read when the reader leaves.
-let currentView = null; // { file, lineScrolls, lineSrc }
+// returned for it, plus bookkeeping for recording the read.
+//   recorded: how many source lines we've already committed (avoids double count)
+//   counted:  whether the dwell timer has fired (page has been "read")
+//   timer:    the dwell timer handle
+let currentView = null; // { file, lineScrolls, lineSrc, recorded, counted, timer, token }
 
 // Bumped on every loadStory() so a slow view-count response from an earlier
 // story can't paint its fading over a story the reader has since switched to.
@@ -64,31 +67,47 @@ function fileForBits(bits) {
   return CONFIG.paths.textsBase + bits + '.md';
 }
 
-// Record how far the current story was read, then clear it. Called when the
-// reader switches stories or leaves the page. "Every page load" counts once:
-// source lines from the top down to the deepest line reached each get +1.
-function finalizeView() {
-  const view = currentView;
-  currentView = null;
-  if (!view || !view.lineScrolls.length) return;
-
-  const maxScroll = getMaxScroll();
+// How many source lines (from the top) have been on screen given a scroll depth:
+// the deepest visual line whose front-scroll was reached, plus a drum-face of
+// lines below it that are visible without scrolling, mapped back to source lines.
+function depthSourceLines(view, maxScroll) {
+  if (!view.lineScrolls.length) return 0;
   const ahead = CONFIG.fade.visibleAhead;
 
-  // Deepest visual line whose front-scroll has been reached, plus a drum-face
-  // of lines below it that are visible even without scrolling.
   let visualCount = ahead;
   for (let i = 0; i < view.lineScrolls.length; i++) {
     if (view.lineScrolls[i] <= maxScroll + 1e-9) visualCount = i + 1 + ahead;
   }
   visualCount = Math.min(view.lineScrolls.length, visualCount);
 
-  // Map those visual lines back to a source-line count (contiguous from 0).
   let sourceLines = 0;
   for (let i = 0; i < visualCount; i++) {
     if (view.lineSrc[i] + 1 > sourceLines) sourceLines = view.lineSrc[i] + 1;
   }
-  recordViews(view.file, sourceLines);
+  return sourceLines;
+}
+
+// Commit newly-read lines: increments only the range beyond what we've already
+// recorded for this view, so committing on load AND on leave never double-counts.
+function commit(view, sourceLines) {
+  if (sourceLines > view.recorded) {
+    recordViews(view.file, view.recorded, sourceLines);
+    view.recorded = sourceLines;
+  }
+}
+
+// Called when the reader leaves the current story (switch, tab hide, or close).
+// If the page hasn't been on screen long enough to count as read, it's dropped;
+// otherwise any lines scrolled into view since the dwell commit are banked.
+function finalizeView() {
+  const view = currentView;
+  if (!view) return;
+  if (!view.counted) {
+    // Too brief (e.g. flipped straight past) — cancel and don't record.
+    if (view.timer) { clearTimeout(view.timer); view.timer = null; }
+    return;
+  }
+  commit(view, depthSourceLines(view, getMaxScroll()));
 }
 
 async function loadStory(bits) {
@@ -119,10 +138,29 @@ async function loadStory(bits) {
 
   // Immediate draw (full-strength text) so the page appears instantly.
   const meta = drawMarkdown(text, []);
-  currentView = { file, lineScrolls: meta.lineScrolls, lineSrc: meta.lineSrc };
+  const view = {
+    file,
+    lineScrolls: meta.lineScrolls,
+    lineSrc: meta.lineSrc,
+    recorded: 0,
+    counted: false,
+    timer: null,
+    token,
+  };
+  currentView = view;
 
-  // Then apply the accumulated fading when the counts land, if this story is
-  // still the one on screen. (No-op when there's no backend or no views yet.)
+  // Record the read after a short dwell — this is the reliable path: it doesn't
+  // depend on the tab-close/switch events (which browsers fire inconsistently).
+  // Commits the lines on screen now; anything scrolled to later is banked on
+  // leave by finalizeView().
+  view.timer = setTimeout(() => {
+    if (loadToken !== token) return; // superseded
+    view.counted = true;
+    commit(view, depthSourceLines(view, getMaxScroll()));
+  }, CONFIG.fade.recordDelayMs);
+
+  // Apply the accumulated fading when the counts land, if this story is still
+  // on screen. (No-op when there's no backend or the page has no views yet.)
   countsPromise.then((counts) => {
     if (token !== loadToken || !counts || !counts.length) return;
     drawMarkdown(text, counts);
